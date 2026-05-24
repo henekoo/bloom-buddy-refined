@@ -49,9 +49,11 @@ function ObservationDetail() {
         subtitle={obs.scientific_name || obs.species || undefined}
         actions={
           <div className="flex gap-2">
-            <Link to="/observations/$id/edit" params={{ id: obs.id }}>
-              <Button variant="outline"><Pencil className="h-4 w-4 mr-1" /> Muokkaa</Button>
-            </Link>
+            <Button asChild variant="outline">
+              <Link to="/observations/$id/edit" params={{ id: obs.id }}>
+                <Pencil className="h-4 w-4 mr-1" /> Muokkaa
+              </Link>
+            </Button>
             <Button variant="outline" onClick={remove}><Trash2 className="h-4 w-4 mr-1" /> Poista</Button>
           </div>
         }
