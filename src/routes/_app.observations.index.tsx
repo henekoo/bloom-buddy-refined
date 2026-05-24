@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { PlantImage } from "@/components/PlantImage";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, MapPin, Leaf } from "lucide-react";
+import { Plus, Search, MapPin, Leaf, Pencil } from "lucide-react";
 import { format } from "date-fns";
 
 
