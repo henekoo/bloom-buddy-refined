@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { StatCard } from "@/components/StatCard";
 import { PageHeader } from "@/components/PageHeader";
-import { Leaf, FolderTree, Sprout, MapPin, Plus, Calendar } from "lucide-react";
+import { Leaf, FolderTree, Sprout, MapPin, Plus, Calendar, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 
