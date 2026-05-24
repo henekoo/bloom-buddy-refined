@@ -55,10 +55,10 @@ export function AppShell() {
               key={item.to}
               to={item.to}
               onClick={() => setOpen(false)}
-              className="group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-              activeProps={{ className: "bg-sidebar-accent text-sidebar-accent-foreground font-medium" }}
+              className="group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:translate-x-0.5 transition-all duration-200"
+              activeProps={{ className: "bg-sidebar-accent text-sidebar-accent-foreground font-medium shadow-soft" }}
             >
-              <item.icon className="h-4 w-4 text-primary" />
+              <item.icon className="h-4 w-4 text-primary transition-transform group-hover:scale-110" />
               {item.label}
             </Link>
           ))}
