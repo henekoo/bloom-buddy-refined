@@ -9,38 +9,221 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSpeciesRouteImport } from './routes/_app.species'
+import { Route as AppMapRouteImport } from './routes/_app.map'
+import { Route as AppExploreRouteImport } from './routes/_app.explore'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppProjectsIndexRouteImport } from './routes/_app.projects.index'
+import { Route as AppObservationsIndexRouteImport } from './routes/_app.observations.index'
+import { Route as AppProjectsNewRouteImport } from './routes/_app.projects.new'
+import { Route as AppProjectsIdRouteImport } from './routes/_app.projects.$id'
+import { Route as AppObservationsNewRouteImport } from './routes/_app.observations.new'
+import { Route as AppObservationsIdRouteImport } from './routes/_app.observations.$id'
+import { Route as AppProjectsIdEditRouteImport } from './routes/_app.projects.$id.edit'
+import { Route as AppObservationsIdEditRouteImport } from './routes/_app.observations.$id.edit'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSpeciesRoute = AppSpeciesRouteImport.update({
+  id: '/species',
+  path: '/species',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMapRoute = AppMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppExploreRoute = AppExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjectsIndexRoute = AppProjectsIndexRouteImport.update({
+  id: '/projects/',
+  path: '/projects/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppObservationsIndexRoute = AppObservationsIndexRouteImport.update({
+  id: '/observations/',
+  path: '/observations/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjectsNewRoute = AppProjectsNewRouteImport.update({
+  id: '/projects/new',
+  path: '/projects/new',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjectsIdRoute = AppProjectsIdRouteImport.update({
+  id: '/projects/$id',
+  path: '/projects/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppObservationsNewRoute = AppObservationsNewRouteImport.update({
+  id: '/observations/new',
+  path: '/observations/new',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppObservationsIdRoute = AppObservationsIdRouteImport.update({
+  id: '/observations/$id',
+  path: '/observations/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjectsIdEditRoute = AppProjectsIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => AppProjectsIdRoute,
+} as any)
+const AppObservationsIdEditRoute = AppObservationsIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => AppObservationsIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/explore': typeof AppExploreRoute
+  '/map': typeof AppMapRoute
+  '/species': typeof AppSpeciesRoute
+  '/observations/$id': typeof AppObservationsIdRouteWithChildren
+  '/observations/new': typeof AppObservationsNewRoute
+  '/projects/$id': typeof AppProjectsIdRouteWithChildren
+  '/projects/new': typeof AppProjectsNewRoute
+  '/observations/': typeof AppObservationsIndexRoute
+  '/projects/': typeof AppProjectsIndexRoute
+  '/observations/$id/edit': typeof AppObservationsIdEditRoute
+  '/projects/$id/edit': typeof AppProjectsIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/explore': typeof AppExploreRoute
+  '/map': typeof AppMapRoute
+  '/species': typeof AppSpeciesRoute
+  '/observations/$id': typeof AppObservationsIdRouteWithChildren
+  '/observations/new': typeof AppObservationsNewRoute
+  '/projects/$id': typeof AppProjectsIdRouteWithChildren
+  '/projects/new': typeof AppProjectsNewRoute
+  '/observations': typeof AppObservationsIndexRoute
+  '/projects': typeof AppProjectsIndexRoute
+  '/observations/$id/edit': typeof AppObservationsIdEditRoute
+  '/projects/$id/edit': typeof AppProjectsIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/explore': typeof AppExploreRoute
+  '/_app/map': typeof AppMapRoute
+  '/_app/species': typeof AppSpeciesRoute
+  '/_app/observations/$id': typeof AppObservationsIdRouteWithChildren
+  '/_app/observations/new': typeof AppObservationsNewRoute
+  '/_app/projects/$id': typeof AppProjectsIdRouteWithChildren
+  '/_app/projects/new': typeof AppProjectsNewRoute
+  '/_app/observations/': typeof AppObservationsIndexRoute
+  '/_app/projects/': typeof AppProjectsIndexRoute
+  '/_app/observations/$id/edit': typeof AppObservationsIdEditRoute
+  '/_app/projects/$id/edit': typeof AppProjectsIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/explore'
+    | '/map'
+    | '/species'
+    | '/observations/$id'
+    | '/observations/new'
+    | '/projects/$id'
+    | '/projects/new'
+    | '/observations/'
+    | '/projects/'
+    | '/observations/$id/edit'
+    | '/projects/$id/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/explore'
+    | '/map'
+    | '/species'
+    | '/observations/$id'
+    | '/observations/new'
+    | '/projects/$id'
+    | '/projects/new'
+    | '/observations'
+    | '/projects'
+    | '/observations/$id/edit'
+    | '/projects/$id/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/auth'
+    | '/_app/dashboard'
+    | '/_app/explore'
+    | '/_app/map'
+    | '/_app/species'
+    | '/_app/observations/$id'
+    | '/_app/observations/new'
+    | '/_app/projects/$id'
+    | '/_app/projects/new'
+    | '/_app/observations/'
+    | '/_app/projects/'
+    | '/_app/observations/$id/edit'
+    | '/_app/projects/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +231,148 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/species': {
+      id: '/_app/species'
+      path: '/species'
+      fullPath: '/species'
+      preLoaderRoute: typeof AppSpeciesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/map': {
+      id: '/_app/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof AppMapRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/explore': {
+      id: '/_app/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof AppExploreRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projects/': {
+      id: '/_app/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof AppProjectsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/observations/': {
+      id: '/_app/observations/'
+      path: '/observations'
+      fullPath: '/observations/'
+      preLoaderRoute: typeof AppObservationsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projects/new': {
+      id: '/_app/projects/new'
+      path: '/projects/new'
+      fullPath: '/projects/new'
+      preLoaderRoute: typeof AppProjectsNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projects/$id': {
+      id: '/_app/projects/$id'
+      path: '/projects/$id'
+      fullPath: '/projects/$id'
+      preLoaderRoute: typeof AppProjectsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/observations/new': {
+      id: '/_app/observations/new'
+      path: '/observations/new'
+      fullPath: '/observations/new'
+      preLoaderRoute: typeof AppObservationsNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/observations/$id': {
+      id: '/_app/observations/$id'
+      path: '/observations/$id'
+      fullPath: '/observations/$id'
+      preLoaderRoute: typeof AppObservationsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projects/$id/edit': {
+      id: '/_app/projects/$id/edit'
+      path: '/edit'
+      fullPath: '/projects/$id/edit'
+      preLoaderRoute: typeof AppProjectsIdEditRouteImport
+      parentRoute: typeof AppProjectsIdRoute
+    }
+    '/_app/observations/$id/edit': {
+      id: '/_app/observations/$id/edit'
+      path: '/edit'
+      fullPath: '/observations/$id/edit'
+      preLoaderRoute: typeof AppObservationsIdEditRouteImport
+      parentRoute: typeof AppObservationsIdRoute
+    }
   }
 }
 
+interface AppObservationsIdRouteChildren {
+  AppObservationsIdEditRoute: typeof AppObservationsIdEditRoute
+}
+
+const AppObservationsIdRouteChildren: AppObservationsIdRouteChildren = {
+  AppObservationsIdEditRoute: AppObservationsIdEditRoute,
+}
+
+const AppObservationsIdRouteWithChildren =
+  AppObservationsIdRoute._addFileChildren(AppObservationsIdRouteChildren)
+
+interface AppProjectsIdRouteChildren {
+  AppProjectsIdEditRoute: typeof AppProjectsIdEditRoute
+}
+
+const AppProjectsIdRouteChildren: AppProjectsIdRouteChildren = {
+  AppProjectsIdEditRoute: AppProjectsIdEditRoute,
+}
+
+const AppProjectsIdRouteWithChildren = AppProjectsIdRoute._addFileChildren(
+  AppProjectsIdRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppExploreRoute: typeof AppExploreRoute
+  AppMapRoute: typeof AppMapRoute
+  AppSpeciesRoute: typeof AppSpeciesRoute
+  AppObservationsIdRoute: typeof AppObservationsIdRouteWithChildren
+  AppObservationsNewRoute: typeof AppObservationsNewRoute
+  AppProjectsIdRoute: typeof AppProjectsIdRouteWithChildren
+  AppProjectsNewRoute: typeof AppProjectsNewRoute
+  AppObservationsIndexRoute: typeof AppObservationsIndexRoute
+  AppProjectsIndexRoute: typeof AppProjectsIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppDashboardRoute: AppDashboardRoute,
+  AppExploreRoute: AppExploreRoute,
+  AppMapRoute: AppMapRoute,
+  AppSpeciesRoute: AppSpeciesRoute,
+  AppObservationsIdRoute: AppObservationsIdRouteWithChildren,
+  AppObservationsNewRoute: AppObservationsNewRoute,
+  AppProjectsIdRoute: AppProjectsIdRouteWithChildren,
+  AppProjectsNewRoute: AppProjectsNewRoute,
+  AppObservationsIndexRoute: AppObservationsIndexRoute,
+  AppProjectsIndexRoute: AppProjectsIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
