@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { PlantImage } from "@/components/PlantImage";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, MapPin, Leaf } from "lucide-react";
+import { Plus, Search, MapPin, Leaf, Pencil } from "lucide-react";
 import { format } from "date-fns";
 
 
@@ -38,9 +38,9 @@ function Observations() {
         title="Havainnot"
         subtitle={`${data?.length ?? 0} kasvihavaintoa`}
         actions={
-          <Link to="/observations/new">
-            <Button className="gradient-leaf text-primary-foreground border-0 shadow-leaf"><Plus className="h-4 w-4 mr-1" /> Uusi</Button>
-          </Link>
+          <Button asChild className="gradient-leaf text-primary-foreground border-0 shadow-leaf">
+            <Link to="/observations/new"><Plus className="h-4 w-4 mr-1" /> Uusi</Link>
+          </Button>
         }
       />
 
@@ -61,8 +61,8 @@ function Observations() {
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {list.map((o) => (
-            <Link key={o.id} to="/observations/$id" params={{ id: o.id }}
-              className="card-hover rounded-2xl border border-border bg-card overflow-hidden block">
+            <div key={o.id} className="card-hover card-surface relative overflow-hidden group">
+              <Link to="/observations/$id" params={{ id: o.id }} className="absolute inset-0 z-0" aria-label={o.name} />
               <PlantImage
                 src={o.image_urls?.[0]}
                 alt={o.name}
@@ -73,11 +73,22 @@ function Observations() {
                   : null}
               />
 
-              <div className="p-4">
+              <Button
+                asChild
+                size="icon"
+                variant="outline"
+                className="absolute top-3 right-3 z-10 h-9 w-9 rounded-full bg-background/90 backdrop-blur-md shadow-elegant opacity-0 group-hover:opacity-100 focus-within:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all"
+              >
+                <Link to="/observations/$id/edit" params={{ id: o.id }} aria-label="Muokkaa havaintoa">
+                  <Pencil className="h-4 w-4" />
+                </Link>
+              </Button>
+
+              <div className="p-4 relative">
                 <div className="font-semibold truncate">{o.name}</div>
                 <div className="text-xs text-muted-foreground italic truncate">{o.scientific_name || o.species || "—"}</div>
                 <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{format(new Date(o.observed_at), "d.M.yyyy")}</span>
+                  <span className="tabular-nums">{format(new Date(o.observed_at), "d.M.yyyy")}</span>
                   {o.location_name && <span className="flex items-center gap-1 truncate max-w-[50%]"><MapPin className="h-3 w-3" />{o.location_name}</span>}
                 </div>
                 {o.tags && o.tags.length > 0 && (
@@ -88,7 +99,7 @@ function Observations() {
                   </div>
                 )}
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

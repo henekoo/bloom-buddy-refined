@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { StatCard } from "@/components/StatCard";
 import { PageHeader } from "@/components/PageHeader";
-import { Leaf, FolderTree, Sprout, MapPin, Plus, Calendar } from "lucide-react";
+import { Leaf, FolderTree, Sprout, MapPin, Plus, Calendar, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 
@@ -39,11 +39,11 @@ function Dashboard() {
         title={`Hei ${user?.user_metadata?.full_name || user?.email?.split("@")[0]} 🌿`}
         subtitle="Yhteenveto luontohavainnoistasi ja projekteistasi"
         actions={
-          <Link to="/observations/new">
-            <Button className="gradient-leaf text-primary-foreground border-0 shadow-leaf">
+          <Button asChild className="gradient-leaf text-primary-foreground border-0 shadow-leaf">
+            <Link to="/observations/new">
               <Plus className="h-4 w-4 mr-1" /> Uusi havainto
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         }
       />
 
@@ -67,8 +67,8 @@ function Dashboard() {
           ) : (
             <div className="space-y-2">
               {observations.slice(0, 6).map((o) => (
-                <Link key={o.id} to="/observations/$id" params={{ id: o.id }}
-                  className="flex items-center gap-4 p-3 rounded-xl hover:bg-muted/60 transition-colors">
+                <div key={o.id} className="group relative flex items-center gap-4 p-3 rounded-xl hover:bg-muted/60 transition-colors">
+                  <Link to="/observations/$id" params={{ id: o.id }} className="absolute inset-0 rounded-xl" aria-label={o.name} />
                   <div className="h-14 w-14 rounded-xl overflow-hidden bg-muted shrink-0 relative">
                     {o.image_urls?.[0]
                       ? <img src={o.image_urls[0]} className="w-full h-full object-cover" alt="" loading="lazy" />
@@ -82,7 +82,12 @@ function Dashboard() {
                     </div>
                   </div>
                   {o.location_name && <div className="text-xs text-muted-foreground hidden sm:flex items-center gap-1"><MapPin className="h-3 w-3" />{o.location_name}</div>}
-                </Link>
+                  <Button asChild size="sm" variant="outline" className="relative z-10 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                    <Link to="/observations/$id/edit" params={{ id: o.id }} onClick={(e) => e.stopPropagation()}>
+                      <Pencil className="h-3.5 w-3.5" /> Muokkaa
+                    </Link>
+                  </Button>
+                </div>
               ))}
             </div>
           )}
@@ -125,9 +130,9 @@ function EmptyState() {
       </div>
       <h3 className="mt-4 font-semibold">Ei vielä havaintoja</h3>
       <p className="text-sm text-muted-foreground mt-1">Lisää ensimmäinen kasvihavainto kuvineen ja sijainteineen.</p>
-      <Link to="/observations/new" className="inline-block mt-4">
-        <Button className="gradient-leaf text-primary-foreground border-0"><Plus className="h-4 w-4 mr-1" /> Uusi havainto</Button>
-      </Link>
+      <Button asChild className="mt-4 gradient-leaf text-primary-foreground border-0 shadow-leaf">
+        <Link to="/observations/new"><Plus className="h-4 w-4 mr-1" /> Uusi havainto</Link>
+      </Button>
     </div>
   );
 }
