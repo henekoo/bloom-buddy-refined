@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
@@ -11,8 +11,18 @@ import { useState } from "react";
 
 
 export const Route = createFileRoute("/_app/observations/$id")({
-  component: ObservationDetail,
+  component: ObservationDetailRoute,
 });
+
+function ObservationDetailRoute() {
+  const location = useLocation();
+
+  if (location.pathname.endsWith("/edit")) {
+    return <Outlet />;
+  }
+
+  return <ObservationDetail />;
+}
 
 function ObservationDetail() {
   const { id } = Route.useParams();
