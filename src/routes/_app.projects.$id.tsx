@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
@@ -9,8 +9,18 @@ import { Trash2, MapPin, Leaf, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/projects/$id")({
-  component: ProjectDetail,
+  component: ProjectDetailRoute,
 });
+
+function ProjectDetailRoute() {
+  const location = useLocation();
+
+  if (location.pathname.endsWith("/edit")) {
+    return <Outlet />;
+  }
+
+  return <ProjectDetail />;
+}
 
 function ProjectDetail() {
   const { id } = Route.useParams();
