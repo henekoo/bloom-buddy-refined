@@ -92,7 +92,7 @@ export function AppShell() {
           <div className="h-7 w-7 rounded-lg gradient-leaf grid place-items-center"><Leaf className="h-4 w-4 text-primary-foreground" /></div>
           <span className="font-semibold">Florea</span>
         </div>
-        <Link to="/observations/new"><Button size="icon" className="gradient-leaf text-primary-foreground border-0"><Plus className="h-4 w-4" /></Button></Link>
+        <Button asChild size="icon" className="gradient-leaf text-primary-foreground border-0 shadow-leaf"><Link to="/observations/new"><Plus className="h-4 w-4" /></Link></Button>
       </div>
 
       <main className="flex-1 min-w-0 md:pl-0 pt-14 md:pt-0">
