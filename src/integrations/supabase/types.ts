@@ -14,7 +14,192 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      observations: {
+        Row: {
+          condition: string | null
+          count: number | null
+          created_at: string
+          description: string | null
+          estimated_size: string | null
+          growth_stage: string | null
+          habitat: string | null
+          id: string
+          image_urls: string[] | null
+          is_favorite: boolean | null
+          latitude: number | null
+          location_name: string | null
+          longitude: number | null
+          name: string
+          notes: string | null
+          observed_at: string
+          rarity: string | null
+          scientific_name: string | null
+          species: string | null
+          tags: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          condition?: string | null
+          count?: number | null
+          created_at?: string
+          description?: string | null
+          estimated_size?: string | null
+          growth_stage?: string | null
+          habitat?: string | null
+          id?: string
+          image_urls?: string[] | null
+          is_favorite?: boolean | null
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          name: string
+          notes?: string | null
+          observed_at?: string
+          rarity?: string | null
+          scientific_name?: string | null
+          species?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          condition?: string | null
+          count?: number | null
+          created_at?: string
+          description?: string | null
+          estimated_size?: string | null
+          growth_stage?: string | null
+          habitat?: string | null
+          id?: string
+          image_urls?: string[] | null
+          is_favorite?: boolean | null
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          name?: string
+          notes?: string | null
+          observed_at?: string
+          rarity?: string | null
+          scientific_name?: string | null
+          species?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      project_observations: {
+        Row: {
+          added_at: string
+          observation_id: string
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          observation_id: string
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          observation_id?: string
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_observations_observation_id_fkey"
+            columns: ["observation_id"]
+            isOneToOne: false
+            referencedRelation: "observations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_observations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          area_sqm: number | null
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          latitude: number | null
+          location_name: string | null
+          longitude: number | null
+          name: string
+          notes: string | null
+          project_type: Database["public"]["Enums"]["project_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area_sqm?: number | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          name: string
+          notes?: string | null
+          project_type?: Database["public"]["Enums"]["project_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area_sqm?: number | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          name?: string
+          notes?: string | null
+          project_type?: Database["public"]["Enums"]["project_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +208,16 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      project_type:
+        | "house_yard"
+        | "cabin_yard"
+        | "forest"
+        | "arboretum"
+        | "greenhouse"
+        | "game_field"
+        | "perennial_bed"
+        | "nursery"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +344,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      project_type: [
+        "house_yard",
+        "cabin_yard",
+        "forest",
+        "arboretum",
+        "greenhouse",
+        "game_field",
+        "perennial_bed",
+        "nursery",
+        "other",
+      ],
+    },
   },
 } as const
