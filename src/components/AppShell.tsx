@@ -64,11 +64,11 @@ export function AppShell() {
           ))}
         </nav>
         <div className="p-3 border-t border-sidebar-border space-y-2">
-          <Link to="/observations/new" onClick={() => setOpen(false)}>
-            <Button className="w-full gradient-leaf text-primary-foreground border-0 shadow-leaf">
+          <Button asChild className="w-full gradient-leaf text-primary-foreground border-0 shadow-leaf hover:shadow-elegant hover:brightness-110 transition-all">
+            <Link to="/observations/new" onClick={() => setOpen(false)}>
               <Plus className="h-4 w-4 mr-1" /> Uusi havainto
-            </Button>
-          </Link>
+            </Link>
+          </Button>
           <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
             <span className="truncate">{user?.email}</span>
             <div className="flex gap-1">
