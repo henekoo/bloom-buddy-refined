@@ -88,7 +88,7 @@ function EditProject() {
       <PageHeader
         title="Muokkaa projektia"
         subtitle={project.name}
-        actions={<Link to="/projects/$id" params={{ id }}><Button variant="outline">Peruuta</Button></Link>}
+        actions={<Button asChild variant="outline"><Link to="/projects/$id" params={{ id }}>Peruuta</Link></Button>}
       />
       <form onSubmit={submit} className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
