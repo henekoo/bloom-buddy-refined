@@ -62,9 +62,11 @@ function ProjectDetail() {
         subtitle={`${meta.emoji} ${meta.label}${project.location_name ? ` · ${project.location_name}` : ""}`}
         actions={
           <div className="flex gap-2">
-            <Link to="/projects/$id/edit" params={{ id: project.id }}>
-              <Button variant="outline"><Pencil className="h-4 w-4 mr-1" /> Muokkaa</Button>
-            </Link>
+            <Button asChild variant="outline">
+              <Link to="/projects/$id/edit" params={{ id: project.id }}>
+                <Pencil className="h-4 w-4 mr-1" /> Muokkaa
+              </Link>
+            </Button>
             <Button variant="outline" onClick={remove}><Trash2 className="h-4 w-4 mr-1" /> Poista</Button>
           </div>
         }
