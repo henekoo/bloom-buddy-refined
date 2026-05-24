@@ -38,9 +38,9 @@ function Observations() {
         title="Havainnot"
         subtitle={`${data?.length ?? 0} kasvihavaintoa`}
         actions={
-          <Link to="/observations/new">
-            <Button className="gradient-leaf text-primary-foreground border-0 shadow-leaf"><Plus className="h-4 w-4 mr-1" /> Uusi</Button>
-          </Link>
+          <Button asChild className="gradient-leaf text-primary-foreground border-0 shadow-leaf">
+            <Link to="/observations/new"><Plus className="h-4 w-4 mr-1" /> Uusi</Link>
+          </Button>
         }
       />
 
