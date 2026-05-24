@@ -130,9 +130,9 @@ function EmptyState() {
       </div>
       <h3 className="mt-4 font-semibold">Ei vielä havaintoja</h3>
       <p className="text-sm text-muted-foreground mt-1">Lisää ensimmäinen kasvihavainto kuvineen ja sijainteineen.</p>
-      <Link to="/observations/new" className="inline-block mt-4">
-        <Button className="gradient-leaf text-primary-foreground border-0"><Plus className="h-4 w-4 mr-1" /> Uusi havainto</Button>
-      </Link>
+      <Button asChild className="mt-4 gradient-leaf text-primary-foreground border-0 shadow-leaf">
+        <Link to="/observations/new"><Plus className="h-4 w-4 mr-1" /> Uusi havainto</Link>
+      </Button>
     </div>
   );
 }
