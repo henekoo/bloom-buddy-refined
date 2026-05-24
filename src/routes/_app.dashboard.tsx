@@ -39,11 +39,11 @@ function Dashboard() {
         title={`Hei ${user?.user_metadata?.full_name || user?.email?.split("@")[0]} 🌿`}
         subtitle="Yhteenveto luontohavainnoistasi ja projekteistasi"
         actions={
-          <Link to="/observations/new">
-            <Button className="gradient-leaf text-primary-foreground border-0 shadow-leaf">
+          <Button asChild className="gradient-leaf text-primary-foreground border-0 shadow-leaf">
+            <Link to="/observations/new">
               <Plus className="h-4 w-4 mr-1" /> Uusi havainto
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         }
       />
 
