@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PROJECT_TYPES, type ProjectTypeValue } from "@/lib/project-types";
 import { MapView } from "@/components/MapView";
+import { CoverImagePicker } from "@/components/CoverImagePicker";
 import { toast } from "sonner";
 import { Loader2, MapPin } from "lucide-react";
 
@@ -106,7 +107,9 @@ function EditProject() {
               </div>
               <div><Label>Pinta-ala (m²)</Label><Input type="number" value={form.area_sqm} onChange={(e) => setForm({ ...form, area_sqm: e.target.value })} /></div>
               <div className="sm:col-span-2"><Label>Paikan nimi</Label><Input value={form.location_name} onChange={(e) => setForm({ ...form, location_name: e.target.value })} /></div>
-              <div className="sm:col-span-2"><Label>Kansikuvan URL</Label><Input value={form.cover_image_url} onChange={(e) => setForm({ ...form, cover_image_url: e.target.value })} placeholder="https://..." /></div>
+              <div className="sm:col-span-2">
+                <CoverImagePicker value={form.cover_image_url} onChange={(v) => setForm({ ...form, cover_image_url: v })} />
+              </div>
               <div className="sm:col-span-2"><Label>Kuvaus</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} /></div>
               <div className="sm:col-span-2"><Label>Muistiinpanot</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3} /></div>
             </div>
