@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/_app/observations/")({
 
 function Observations() {
   const [q, setQ] = useState("");
+  const nav = useNavigate();
   const { data, isLoading } = useQuery({
     queryKey: ["observations"],
     queryFn: async () => {
@@ -61,8 +62,12 @@ function Observations() {
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {list.map((o) => (
-            <div key={o.id} className="card-hover card-surface relative overflow-hidden group">
-              <Link to="/observations/$id" params={{ id: o.id }} className="absolute inset-0 z-0" aria-label={o.name} />
+            <Link
+              key={o.id}
+              to="/observations/$id"
+              params={{ id: o.id }}
+              className="card-hover card-surface relative overflow-hidden group block focus:outline-none focus:ring-2 focus:ring-primary"
+            >
               <PlantImage
                 src={o.image_urls?.[0]}
                 alt={o.name}
@@ -73,18 +78,20 @@ function Observations() {
                   : null}
               />
 
-              <Button
-                asChild
-                size="icon"
-                variant="outline"
-                className="absolute top-3 right-3 z-10 h-9 w-9 rounded-full bg-background/90 backdrop-blur-md shadow-elegant opacity-0 group-hover:opacity-100 focus-within:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all"
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  nav({ to: "/observations/$id/edit", params: { id: o.id } });
+                }}
+                aria-label="Muokkaa havaintoa"
+                className="absolute top-3 right-3 z-10 h-10 w-10 rounded-full bg-background/95 backdrop-blur-md shadow-elegant border border-border grid place-items-center md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100 transition-all hover:scale-110"
               >
-                <Link to="/observations/$id/edit" params={{ id: o.id }} aria-label="Muokkaa havaintoa">
-                  <Pencil className="h-4 w-4" />
-                </Link>
-              </Button>
+                <Pencil className="h-4 w-4" />
+              </button>
 
-              <div className="p-4 relative">
+              <div className="p-4">
                 <div className="font-semibold truncate">{o.name}</div>
                 <div className="text-xs text-muted-foreground italic truncate">{o.scientific_name || o.species || "—"}</div>
                 <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
@@ -99,7 +106,7 @@ function Observations() {
                   </div>
                 )}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
