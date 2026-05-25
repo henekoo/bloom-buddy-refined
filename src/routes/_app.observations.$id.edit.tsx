@@ -13,7 +13,7 @@ import { ImageUpload } from "@/components/ImageUpload";
 import { MapView } from "@/components/MapView";
 import { uploadObservationImages } from "@/lib/storage";
 import { toast } from "sonner";
-import { Loader2, MapPin, X } from "lucide-react";
+import { Loader2, MapPin, X, ArrowLeft, ArrowRight, Star } from "lucide-react";
 
 export const Route = createFileRoute("/_app/observations/$id/edit")({
   component: EditObservation,
@@ -206,19 +206,54 @@ function EditObservation() {
             <h3 className="font-semibold">Kuvat</h3>
             {existingImages.length > 0 && (
               <div>
-                <div className="text-xs text-muted-foreground mb-2">Nykyiset kuvat</div>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                  {existingImages.map((url) => (
-                    <div key={url} className="relative group aspect-square rounded-xl overflow-hidden bg-muted ring-1 ring-border">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-xs text-muted-foreground">Nykyiset kuvat — ensimmäinen näkyy kansikuvana</div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                  {existingImages.map((url, i) => (
+                    <div key={url} className="relative aspect-square rounded-xl overflow-hidden bg-muted ring-1 ring-border">
                       <img src={url} className="w-full h-full object-cover" alt="" loading="lazy" />
+                      {i === 0 && (
+                        <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-primary text-primary-foreground text-[10px] font-medium flex items-center gap-1">
+                          <Star className="h-2.5 w-2.5 fill-current" /> Kansi
+                        </span>
+                      )}
                       <button
                         type="button"
                         onClick={() => setExistingImages((prev) => prev.filter((u) => u !== url))}
                         aria-label="Poista kuva"
-                        className="absolute top-1.5 right-1.5 h-7 w-7 rounded-full bg-black/70 text-white grid place-items-center opacity-0 group-hover:opacity-100 focus:opacity-100 transition"
+                        className="absolute top-1.5 right-1.5 h-7 w-7 rounded-full bg-black/70 text-white grid place-items-center hover:bg-black/90 transition"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
+                      <div className="absolute bottom-1.5 inset-x-1.5 flex gap-1 justify-between">
+                        <button
+                          type="button"
+                          disabled={i === 0}
+                          onClick={() => setExistingImages((prev) => {
+                            const arr = [...prev];
+                            [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]];
+                            return arr;
+                          })}
+                          className="h-7 w-7 rounded-full bg-background/95 text-foreground grid place-items-center shadow-sm hover:bg-background disabled:opacity-30 disabled:cursor-not-allowed transition"
+                          aria-label="Siirrä vasemmalle"
+                        >
+                          <ArrowLeft className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={i === existingImages.length - 1}
+                          onClick={() => setExistingImages((prev) => {
+                            const arr = [...prev];
+                            [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
+                            return arr;
+                          })}
+                          className="h-7 w-7 rounded-full bg-background/95 text-foreground grid place-items-center shadow-sm hover:bg-background disabled:opacity-30 disabled:cursor-not-allowed transition"
+                          aria-label="Siirrä oikealle"
+                        >
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
