@@ -29,7 +29,8 @@ function ObservationDetail() {
   const { id } = Route.useParams();
   const nav = useNavigate();
   const qc = useQueryClient();
-  const [lightbox, setLightbox] = useState<string | null>(null);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [speciesOpen, setSpeciesOpen] = useState(false);
 
   const { data: obs, isLoading } = useQuery({
     queryKey: ["observation", id],
