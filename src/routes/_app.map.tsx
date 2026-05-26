@@ -18,6 +18,7 @@ function MapPage() {
   const [q, setQ] = useState("");
   const [rarity, setRarity] = useState<string>("all");
   const [withImages, setWithImages] = useState<string>("all");
+  const [place, setPlace] = useState<LocationPick>(null);
 
   const { data } = useQuery({
     queryKey: ["map-obs"],
@@ -35,12 +36,14 @@ function MapPage() {
       if (rarity !== "all" && o.rarity !== rarity) return false;
       if (withImages === "yes" && !(o.image_urls && o.image_urls.length > 0)) return false;
       if (withImages === "no" && o.image_urls && o.image_urls.length > 0) return false;
+      if (place && !inBbox(o.latitude, o.longitude, place.bbox)) return false;
       if (!s) return true;
       return [o.name, o.species, o.scientific_name, o.location_name, ...(o.tags ?? [])]
         .filter(Boolean)
         .some((v) => String(v).toLowerCase().includes(s));
     });
-  }, [data, q, rarity, withImages]);
+  }, [data, q, rarity, withImages, place]);
+
 
   const points = filtered.map((o) => ({
     id: o.id, lat: o.latitude!, lng: o.longitude!,
