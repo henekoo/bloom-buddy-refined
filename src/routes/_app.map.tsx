@@ -7,6 +7,7 @@ import { MapView } from "@/components/MapView";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { LocationSearch, inBbox, type LocationPick } from "@/components/LocationSearch";
 import { Search, X } from "lucide-react";
 
 export const Route = createFileRoute("/_app/map")({
@@ -17,6 +18,7 @@ function MapPage() {
   const [q, setQ] = useState("");
   const [rarity, setRarity] = useState<string>("all");
   const [withImages, setWithImages] = useState<string>("all");
+  const [place, setPlace] = useState<LocationPick>(null);
 
   const { data } = useQuery({
     queryKey: ["map-obs"],
@@ -34,12 +36,14 @@ function MapPage() {
       if (rarity !== "all" && o.rarity !== rarity) return false;
       if (withImages === "yes" && !(o.image_urls && o.image_urls.length > 0)) return false;
       if (withImages === "no" && o.image_urls && o.image_urls.length > 0) return false;
+      if (place && !inBbox(o.latitude, o.longitude, place.bbox)) return false;
       if (!s) return true;
       return [o.name, o.species, o.scientific_name, o.location_name, ...(o.tags ?? [])]
         .filter(Boolean)
         .some((v) => String(v).toLowerCase().includes(s));
     });
-  }, [data, q, rarity, withImages]);
+  }, [data, q, rarity, withImages, place]);
+
 
   const points = filtered.map((o) => ({
     id: o.id, lat: o.latitude!, lng: o.longitude!,
@@ -47,28 +51,33 @@ function MapPage() {
     link: `/observations/${o.id}`,
   }));
 
-  const reset = () => { setQ(""); setRarity("all"); setWithImages("all"); };
-  const hasFilters = q || rarity !== "all" || withImages !== "all";
+  const reset = () => { setQ(""); setRarity("all"); setWithImages("all"); setPlace(null); };
+  const hasFilters = q || rarity !== "all" || withImages !== "all" || place;
+
+  const mapCenter: [number, number] | undefined = place
+    ? [(place.bbox[0] + place.bbox[1]) / 2, (place.bbox[2] + place.bbox[3]) / 2]
+    : undefined;
 
   return (
     <div>
       <PageHeader
         title="Kartta"
-        subtitle={`${points.length} / ${data?.length ?? 0} havaintoa kartalla`}
+        subtitle={`${points.length} / ${data?.length ?? 0} havaintoa kartalla${place ? ` · ${place.label}` : ""}`}
       />
 
-      <div className="mb-4 grid gap-2 sm:grid-cols-[1fr_auto_auto_auto]">
+      <div className="mb-4 grid gap-2 md:grid-cols-2 lg:grid-cols-[1fr_1fr_auto_auto_auto]">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Hae nimellä, lajilla, paikalla, tagilla…"
+            placeholder="Hae nimellä, lajilla, tagilla…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="pl-10"
           />
         </div>
+        <LocationSearch value={place} onChange={setPlace} />
         <Select value={rarity} onValueChange={setRarity}>
-          <SelectTrigger className="sm:w-44"><SelectValue placeholder="Harvinaisuus" /></SelectTrigger>
+          <SelectTrigger className="lg:w-44"><SelectValue placeholder="Harvinaisuus" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Kaikki harvinaisuudet</SelectItem>
             <SelectItem value="common">Yleinen</SelectItem>
@@ -78,7 +87,7 @@ function MapPage() {
           </SelectContent>
         </Select>
         <Select value={withImages} onValueChange={setWithImages}>
-          <SelectTrigger className="sm:w-40"><SelectValue placeholder="Kuvat" /></SelectTrigger>
+          <SelectTrigger className="lg:w-40"><SelectValue placeholder="Kuvat" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Kaikki</SelectItem>
             <SelectItem value="yes">Vain kuvalliset</SelectItem>
@@ -92,7 +101,8 @@ function MapPage() {
         )}
       </div>
 
-      <MapView points={points} height="72vh" />
+      <MapView points={points} height="72vh" center={mapCenter} />
     </div>
   );
 }
+

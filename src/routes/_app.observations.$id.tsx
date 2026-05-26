@@ -4,10 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { MapView } from "@/components/MapView";
-import { Trash2, MapPin, Calendar, Tag, Pencil } from "lucide-react";
+import { SpeciesInfoDialog } from "@/components/SpeciesInfoDialog";
+import { Trash2, MapPin, Calendar, Tag, Pencil, Info, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 export const Route = createFileRoute("/_app/observations/$id")({
@@ -28,7 +29,8 @@ function ObservationDetail() {
   const { id } = Route.useParams();
   const nav = useNavigate();
   const qc = useQueryClient();
-  const [lightbox, setLightbox] = useState<string | null>(null);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [speciesOpen, setSpeciesOpen] = useState(false);
 
   const { data: obs, isLoading } = useQuery({
     queryKey: ["observation", id],
@@ -58,7 +60,12 @@ function ObservationDetail() {
         title={obs.name}
         subtitle={obs.scientific_name || obs.species || undefined}
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            {(obs.scientific_name || obs.species) && (
+              <Button variant="outline" onClick={() => setSpeciesOpen(true)}>
+                <Info className="h-4 w-4 mr-1" /> Lajin tiedot
+              </Button>
+            )}
             <Button asChild variant="outline">
               <Link to="/observations/$id/edit" params={{ id: obs.id }}>
                 <Pencil className="h-4 w-4 mr-1" /> Muokkaa
@@ -70,16 +77,23 @@ function ObservationDetail() {
       />
 
 
+
       {obs.image_urls && obs.image_urls.length > 0 ? (
-        <div className={`grid gap-3 mb-6 ${obs.image_urls.length === 1 ? "grid-cols-1" : "grid-cols-2 md:grid-cols-3"}`}>
-          {obs.image_urls.map((url, i) => (
-            <button key={i} onClick={() => setLightbox(url)} className="group rounded-2xl overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary">
-              <div className="aspect-[4/3] bg-muted overflow-hidden">
-                <img src={url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" loading="lazy" />
-              </div>
-            </button>
-          ))}
-        </div>
+        obs.image_urls.length === 1 ? (
+          <button onClick={() => setLightboxIdx(0)} className="group block w-full mb-6 rounded-2xl overflow-hidden bg-muted/40 border border-border focus:outline-none focus:ring-2 focus:ring-primary">
+            <img src={obs.image_urls[0]} className="w-full max-h-[70vh] object-contain transition-transform duration-500 group-hover:scale-[1.01]" alt={obs.name} loading="lazy" />
+          </button>
+        ) : (
+          <div className="grid gap-3 mb-6 grid-cols-2 md:grid-cols-3">
+            {obs.image_urls.map((url, i) => (
+              <button key={i} onClick={() => setLightboxIdx(i)} className="group rounded-2xl overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary">
+                <div className="aspect-[4/3] bg-muted overflow-hidden">
+                  <img src={url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" loading="lazy" />
+                </div>
+              </button>
+            ))}
+          </div>
+        )
       ) : (
         <div className="mb-6 rounded-2xl overflow-hidden border border-dashed border-border">
           <div className="aspect-[16/9] sm:aspect-[21/9] bg-muted/40 grid place-items-center text-muted-foreground text-sm">
@@ -87,6 +101,7 @@ function ObservationDetail() {
           </div>
         </div>
       )}
+
 
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -123,14 +138,90 @@ function ObservationDetail() {
         </div>
       </div>
 
-      {lightbox && (
-        <div onClick={() => setLightbox(null)} className="fixed inset-0 z-50 bg-black/90 grid place-items-center p-4 animate-fade-in">
-          <img src={lightbox} className="max-w-full max-h-full object-contain rounded-lg" alt="" />
-        </div>
+      {lightboxIdx !== null && obs.image_urls && obs.image_urls[lightboxIdx] && (
+        <Lightbox
+          images={obs.image_urls}
+          index={lightboxIdx}
+          onIndex={setLightboxIdx}
+          onClose={() => setLightboxIdx(null)}
+        />
+      )}
+
+      {(obs.scientific_name || obs.species) && (
+        <SpeciesInfoDialog
+          open={speciesOpen}
+          onOpenChange={setSpeciesOpen}
+          scientificName={obs.scientific_name || obs.species || ""}
+          commonNameFi={obs.species}
+        />
       )}
     </div>
   );
 }
+
+function Lightbox({ images, index, onIndex, onClose }: { images: string[]; index: number; onIndex: (i: number | null) => void; onClose: () => void }) {
+  const [scale, setScale] = useState(1);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    setScale(1); setPos({ x: 0, y: 0 });
+  }, [index]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowRight" && index < images.length - 1) onIndex(index + 1);
+      else if (e.key === "ArrowLeft" && index > 0) onIndex(index - 1);
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+  }, [index, images.length, onIndex, onClose]);
+
+  return (
+    <div className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center animate-fade-in select-none">
+      <button onClick={onClose} aria-label="Sulje" className="absolute top-4 right-4 z-10 h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white grid place-items-center">
+        <X className="h-5 w-5" />
+      </button>
+      {images.length > 1 && (
+        <div className="absolute top-4 left-4 z-10 px-3 py-1.5 rounded-full bg-white/10 text-white text-sm">{index + 1} / {images.length}</div>
+      )}
+      {index > 0 && (
+        <button onClick={() => onIndex(index - 1)} aria-label="Edellinen" className="absolute left-2 sm:left-4 z-10 h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 text-white grid place-items-center">
+          <ChevronLeft className="h-6 w-6" />
+        </button>
+      )}
+      {index < images.length - 1 && (
+        <button onClick={() => onIndex(index + 1)} aria-label="Seuraava" className="absolute right-2 sm:right-4 z-10 h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 text-white grid place-items-center">
+          <ChevronRight className="h-6 w-6" />
+        </button>
+      )}
+      <div
+        className="w-full h-full flex items-center justify-center overflow-hidden"
+        onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+        onWheel={(e) => { e.preventDefault(); setScale((s) => Math.max(1, Math.min(5, s + (e.deltaY < 0 ? 0.2 : -0.2)))); }}
+        onMouseDown={(e) => { if (scale > 1) setDragging({ x: e.clientX - pos.x, y: e.clientY - pos.y }); }}
+        onMouseMove={(e) => { if (dragging) setPos({ x: e.clientX - dragging.x, y: e.clientY - dragging.y }); }}
+        onMouseUp={() => setDragging(null)}
+        onMouseLeave={() => setDragging(null)}
+        onDoubleClick={() => { setScale((s) => (s > 1 ? 1 : 2)); setPos({ x: 0, y: 0 }); }}
+      >
+        <img
+          src={images[index]}
+          className="max-w-[95vw] max-h-[90vh] object-contain transition-transform duration-150"
+          style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, cursor: scale > 1 ? (dragging ? "grabbing" : "grab") : "zoom-in" }}
+          alt=""
+          draggable={false}
+        />
+      </div>
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-white/10 text-white text-xs">
+        Vieritä = zoom · 2× klik = vaihda · Esc = sulje
+      </div>
+    </div>
+  );
+}
+
 
 function Item({ label, value, icon: Icon, italic }: { label: string; value: unknown; icon?: React.ComponentType<{ className?: string }>; italic?: boolean }) {
   if (!value && value !== 0) return null;

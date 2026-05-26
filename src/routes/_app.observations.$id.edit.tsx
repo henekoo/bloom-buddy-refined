@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ImageUpload } from "@/components/ImageUpload";
 import { MapView } from "@/components/MapView";
+import { TaxonSearch } from "@/components/TaxonSearch";
 import { uploadObservationImages } from "@/lib/storage";
 import { toast } from "sonner";
 import { Loader2, MapPin, X, ArrowLeft, ArrowRight, Star } from "lucide-react";
@@ -166,8 +167,13 @@ function EditObservation() {
             <div className="grid sm:grid-cols-2 gap-4">
               <div><Label>Nimi *</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
               <div><Label>Päivä *</Label><Input type="date" required value={form.observed_at} onChange={(e) => setForm({ ...form, observed_at: e.target.value })} /></div>
-              <div><Label>Laji</Label><Input value={form.species} onChange={(e) => setForm({ ...form, species: e.target.value })} /></div>
-              <div><Label>Tieteellinen nimi</Label><Input value={form.scientific_name} onChange={(e) => setForm({ ...form, scientific_name: e.target.value })} /></div>
+              <TaxonSearch
+                species={form.species}
+                scientificName={form.scientific_name}
+                required={false}
+                onChange={(v) => setForm((f) => ({ ...f, species: v.species, scientific_name: v.scientific_name }))}
+              />
+
               <div><Label>Kasvupaikka</Label><Input value={form.habitat} onChange={(e) => setForm({ ...form, habitat: e.target.value })} /></div>
               <div><Label>Kasvuvaihe</Label><Input value={form.growth_stage} onChange={(e) => setForm({ ...form, growth_stage: e.target.value })} /></div>
               <div>
