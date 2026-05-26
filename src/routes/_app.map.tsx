@@ -7,6 +7,7 @@ import { MapView } from "@/components/MapView";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { LocationSearch, inBbox, type LocationPick } from "@/components/LocationSearch";
 import { Search, X } from "lucide-react";
 
 export const Route = createFileRoute("/_app/map")({
