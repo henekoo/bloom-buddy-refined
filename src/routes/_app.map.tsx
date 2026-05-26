@@ -103,7 +103,6 @@ function MapPage() {
 
       <MapView points={points} height="72vh" center={mapCenter} />
     </div>
-
-    </div>
   );
 }
+
