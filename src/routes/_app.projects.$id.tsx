@@ -1,11 +1,14 @@
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { MapView } from "@/components/MapView";
+import { PlantImage } from "@/components/PlantImage";
 import { projectTypeMeta } from "@/lib/project-types";
-import { Trash2, MapPin, Leaf, Pencil } from "lucide-react";
+import { Trash2, MapPin, Leaf, Pencil, Search, Sprout, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/projects/$id")({
