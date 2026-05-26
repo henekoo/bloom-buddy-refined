@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ImageUpload } from "@/components/ImageUpload";
 import { MapView } from "@/components/MapView";
+import { TaxonSearch } from "@/components/TaxonSearch";
 import { uploadObservationImages } from "@/lib/storage";
 import { toast } from "sonner";
 import { MapPin, Loader2 } from "lucide-react";
