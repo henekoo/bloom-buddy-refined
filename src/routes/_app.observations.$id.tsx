@@ -4,10 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { MapView } from "@/components/MapView";
-import { Trash2, MapPin, Calendar, Tag, Pencil } from "lucide-react";
+import { SpeciesInfoDialog } from "@/components/SpeciesInfoDialog";
+import { Trash2, MapPin, Calendar, Tag, Pencil, Info, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 export const Route = createFileRoute("/_app/observations/$id")({
