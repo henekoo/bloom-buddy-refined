@@ -79,15 +79,21 @@ function ObservationDetail() {
 
 
       {obs.image_urls && obs.image_urls.length > 0 ? (
-        <div className={`grid gap-3 mb-6 ${obs.image_urls.length === 1 ? "grid-cols-1" : "grid-cols-2 md:grid-cols-3"}`}>
-          {obs.image_urls.map((url, i) => (
-            <button key={i} onClick={() => setLightbox(url)} className="group rounded-2xl overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary">
-              <div className="aspect-[4/3] bg-muted overflow-hidden">
-                <img src={url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" loading="lazy" />
-              </div>
-            </button>
-          ))}
-        </div>
+        obs.image_urls.length === 1 ? (
+          <button onClick={() => setLightboxIdx(0)} className="group block w-full mb-6 rounded-2xl overflow-hidden bg-muted/40 border border-border focus:outline-none focus:ring-2 focus:ring-primary">
+            <img src={obs.image_urls[0]} className="w-full max-h-[70vh] object-contain transition-transform duration-500 group-hover:scale-[1.01]" alt={obs.name} loading="lazy" />
+          </button>
+        ) : (
+          <div className="grid gap-3 mb-6 grid-cols-2 md:grid-cols-3">
+            {obs.image_urls.map((url, i) => (
+              <button key={i} onClick={() => setLightboxIdx(i)} className="group rounded-2xl overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary">
+                <div className="aspect-[4/3] bg-muted overflow-hidden">
+                  <img src={url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" loading="lazy" />
+                </div>
+              </button>
+            ))}
+          </div>
+        )
       ) : (
         <div className="mb-6 rounded-2xl overflow-hidden border border-dashed border-border">
           <div className="aspect-[16/9] sm:aspect-[21/9] bg-muted/40 grid place-items-center text-muted-foreground text-sm">
@@ -95,6 +101,7 @@ function ObservationDetail() {
           </div>
         </div>
       )}
+
 
 
       <div className="grid lg:grid-cols-3 gap-6">
