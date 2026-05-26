@@ -60,7 +60,12 @@ function ObservationDetail() {
         title={obs.name}
         subtitle={obs.scientific_name || obs.species || undefined}
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            {(obs.scientific_name || obs.species) && (
+              <Button variant="outline" onClick={() => setSpeciesOpen(true)}>
+                <Info className="h-4 w-4 mr-1" /> Lajin tiedot
+              </Button>
+            )}
             <Button asChild variant="outline">
               <Link to="/observations/$id/edit" params={{ id: obs.id }}>
                 <Pencil className="h-4 w-4 mr-1" /> Muokkaa
@@ -70,6 +75,7 @@ function ObservationDetail() {
           </div>
         }
       />
+
 
 
       {obs.image_urls && obs.image_urls.length > 0 ? (
