@@ -29,6 +29,8 @@ function ProjectDetail() {
   const { id } = Route.useParams();
   const nav = useNavigate();
   const qc = useQueryClient();
+  const [filter, setFilter] = useState("");
+
 
   const { data: project, isLoading } = useQuery({
     queryKey: ["project", id],
