@@ -29,16 +29,22 @@ const TILES = {
 const sourceColor: Record<UnifiedObservation["source"], string> = {
   gbif: "#22c55e",
   inaturalist: "#0ea5e9",
+  app: "#a855f7",
 };
 
 function makeIcon(o: UnifiedObservation) {
   const color = sourceColor[o.source];
   const ring = o.identificationConfidence === "research" ? "white" : "rgba(255,255,255,.6)";
+  const isApp = o.source === "app";
+  const size = isApp ? 22 : 18;
+  const inner = isApp
+    ? `<div style="position:absolute;inset:0;display:grid;place-items:center;color:white;font-size:12px;font-weight:700;">★</div>`
+    : "";
   return L.divIcon({
     className: "",
-    html: `<div style="width:18px;height:18px;border-radius:50%;background:${color};box-shadow:0 0 0 2px ${ring},0 4px 10px rgba(0,0,0,.35);"></div>`,
-    iconSize: [18, 18],
-    iconAnchor: [9, 9],
+    html: `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;background:${color};box-shadow:0 0 0 2px ${ring},0 4px 10px rgba(0,0,0,.35);">${inner}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
   });
 }
 

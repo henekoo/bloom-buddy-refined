@@ -3,7 +3,7 @@
 //
 // All requests fired client-side; React Query handles caching + dedup.
 
-export type Source = "gbif" | "inaturalist";
+export type Source = "gbif" | "inaturalist" | "app";
 
 export type UnifiedObservation = {
   id: string;
@@ -217,8 +217,46 @@ export async function fetchObservations(taxon: TaxonMatch, signal?: AbortSignal)
   const tasks: Promise<UnifiedObservation[]>[] = [];
   if (taxon.gbifKey) tasks.push(fetchGbif(taxon.gbifKey, signal).catch(() => []));
   if (taxon.inatId) tasks.push(fetchINaturalist(taxon.inatId, signal).catch(() => []));
+  tasks.push(fetchAppObservations(taxon).catch(() => []));
   const results = (await Promise.all(tasks)).flat();
   return dedupe(results);
+}
+
+// Fetch observations from this app's own database that match the taxon's
+// scientific or vernacular name (case-insensitive substring match).
+export async function fetchAppObservations(taxon: TaxonMatch): Promise<UnifiedObservation[]> {
+  const { supabase } = await import("@/integrations/supabase/client");
+  const names = [taxon.scientificName, taxon.vernacularName].filter(Boolean) as string[];
+  if (!names.length) return [];
+  const ors = names
+    .flatMap((n) => [`scientific_name.ilike.%${n}%`, `species.ilike.%${n}%`, `name.ilike.%${n}%`])
+    .join(",");
+  const { data, error } = await supabase
+    .from("observations")
+    .select("id,name,species,scientific_name,latitude,longitude,image_urls,observed_at,location_name")
+    .not("latitude", "is", null)
+    .or(ors)
+    .limit(2000);
+  if (error || !data) return [];
+  return data
+    .filter((o) => typeof o.latitude === "number" && typeof o.longitude === "number")
+    .map<UnifiedObservation>((o) => ({
+      id: `app-${o.id}`,
+      source: "app",
+      sourceUrl: `/observations/${o.id}`,
+      lat: o.latitude!,
+      lng: o.longitude!,
+      observedAt: o.observed_at ?? null,
+      recordedBy: null,
+      scientificName: o.scientific_name ?? taxon.scientificName,
+      vernacularName: o.species ?? o.name ?? taxon.vernacularName ?? null,
+      image: o.image_urls?.[0] ?? null,
+      images: o.image_urls ?? [],
+      locality: o.location_name ?? null,
+      basisOfRecord: "HumanObservation",
+      isWild: null,
+      identificationConfidence: "research",
+    }));
 }
 
 // Dedupe by rounded coords + date + source-different

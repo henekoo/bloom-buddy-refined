@@ -53,7 +53,7 @@ function ExplorePage() {
   const [activeTaxon, setActiveTaxon] = useState<TaxonMatch | null>(null);
   const [mode, setMode] = useState<"cluster" | "heat">("cluster");
   const [basemap, setBasemap] = useState<"map" | "satellite" | "dark">("map");
-  const [sources, setSources] = useState<Record<Source, boolean>>({ gbif: true, inaturalist: true });
+  const [sources, setSources] = useState<Record<Source, boolean>>({ gbif: true, inaturalist: true, app: true });
   const [onlyResearch, setOnlyResearch] = useState(false);
   const [onlyWild, setOnlyWild] = useState(false);
   const [withImage, setWithImage] = useState(false);
@@ -261,6 +261,10 @@ function ExplorePage() {
                       <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
                       iNaturalist {stats.bySource.inaturalist ?? 0}
                     </Badge>
+                    <Badge variant="secondary" className="gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#a855f7" }} />
+                      Sovellus {stats.bySource.app ?? 0}
+                    </Badge>
                     <Badge variant="secondary">{stats.withImg} kuvaa</Badge>
                   </div>
                 </div>
@@ -286,7 +290,7 @@ function ExplorePage() {
                 <div>
                   <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-2">Lähteet</div>
                   <div className="flex gap-2">
-                    {(["gbif", "inaturalist"] as Source[]).map((s) => (
+                    {(["gbif", "inaturalist", "app"] as Source[]).map((s) => (
                       <button
                         key={s}
                         onClick={() => setSources((p) => ({ ...p, [s]: !p[s] }))}
@@ -298,12 +302,10 @@ function ExplorePage() {
                         )}
                       >
                         <span
-                          className={cn(
-                            "inline-block h-2 w-2 rounded-full mr-1.5",
-                            s === "gbif" ? "bg-green-500" : "bg-sky-500",
-                          )}
+                          className="inline-block h-2 w-2 rounded-full mr-1.5"
+                          style={{ background: s === "gbif" ? "#22c55e" : s === "inaturalist" ? "#0ea5e9" : "#a855f7" }}
                         />
-                        {s === "gbif" ? "GBIF" : "iNaturalist"}
+                        {s === "gbif" ? "GBIF" : s === "inaturalist" ? "iNaturalist" : "Sovellus"}
                       </button>
                     ))}
                   </div>
@@ -446,14 +448,24 @@ function ExplorePage() {
                   {selected.identificationConfidence}
                 </Badge>
               )}
-              <a
-                href={selected.sourceUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-center gap-1.5 w-full text-sm py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
-              >
-                Avaa alkuperäisessä lähteessä <ExternalLink className="h-3.5 w-3.5" />
-              </a>
+              {selected.source === "app" ? (
+                <Link
+                  to="/observations/$id"
+                  params={{ id: selected.id.replace(/^app-/, "") }}
+                  className="flex items-center justify-center gap-1.5 w-full text-sm py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+                >
+                  Avaa havainto <ExternalLink className="h-3.5 w-3.5" />
+                </Link>
+              ) : (
+                <a
+                  href={selected.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center gap-1.5 w-full text-sm py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+                >
+                  Avaa alkuperäisessä lähteessä <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -481,6 +493,9 @@ function ExplorePage() {
             </div>
             <div className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full bg-sky-500" /> iNaturalist
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#a855f7" }} /> Sovellus
             </div>
           </div>
         </div>
