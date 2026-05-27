@@ -54,61 +54,104 @@ function ObservationDetail() {
     return <div className="h-96 rounded-2xl bg-muted animate-pulse" />;
   }
 
+  const hasImages = obs.image_urls && obs.image_urls.length > 0;
+  const rarityColor: Record<string, string> = {
+    common: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+    uncommon: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+    rare: "bg-orange-500/15 text-orange-700 dark:text-orange-300",
+    very_rare: "bg-rose-500/15 text-rose-700 dark:text-rose-300",
+  };
+
   return (
-    <div>
-      <PageHeader
-        title={obs.name}
-        subtitle={obs.scientific_name || obs.species || undefined}
-        actions={
-          <div className="flex flex-wrap gap-2">
-            {(obs.scientific_name || obs.species) && (
-              <Button variant="outline" onClick={() => setSpeciesOpen(true)}>
-                <Info className="h-4 w-4 mr-1" /> Lajin tiedot
-              </Button>
-            )}
-            <Button asChild variant="outline">
-              <Link to="/observations/$id/edit" params={{ id: obs.id }}>
-                <Pencil className="h-4 w-4 mr-1" /> Muokkaa
-              </Link>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-2">
+        <Button asChild variant="ghost" size="sm" className="-ml-2">
+          <Link to="/observations"><ChevronLeft className="h-4 w-4 mr-1" /> Havainnot</Link>
+        </Button>
+        <div className="flex flex-wrap gap-2 justify-end">
+          {(obs.scientific_name || obs.species) && (
+            <Button variant="outline" size="sm" onClick={() => setSpeciesOpen(true)}>
+              <Info className="h-4 w-4 mr-1" /> Lajin tiedot
             </Button>
-            <Button variant="outline" onClick={remove}><Trash2 className="h-4 w-4 mr-1" /> Poista</Button>
-          </div>
-        }
-      />
+          )}
+          <Button asChild variant="outline" size="sm">
+            <Link to="/observations/$id/edit" params={{ id: obs.id }}>
+              <Pencil className="h-4 w-4 mr-1" /> Muokkaa
+            </Link>
+          </Button>
+          <Button variant="outline" size="sm" onClick={remove} className="text-destructive hover:text-destructive">
+            <Trash2 className="h-4 w-4 mr-1" /> Poista
+          </Button>
+        </div>
+      </div>
 
-
-
-      {obs.image_urls && obs.image_urls.length > 0 ? (
-        obs.image_urls.length === 1 ? (
-          <button onClick={() => setLightboxIdx(0)} className="group block w-full mb-6 rounded-2xl overflow-hidden bg-muted/40 border border-border focus:outline-none focus:ring-2 focus:ring-primary">
-            <img src={obs.image_urls[0]} className="w-full max-h-[70vh] object-contain transition-transform duration-500 group-hover:scale-[1.01]" alt={obs.name} loading="lazy" />
+      {/* Hero */}
+      <section className="relative rounded-3xl overflow-hidden border border-border bg-gradient-to-br from-primary/5 via-card to-card shadow-leaf">
+        {hasImages ? (
+          <button
+            onClick={() => setLightboxIdx(0)}
+            className="block w-full bg-muted/40 focus:outline-none"
+            aria-label="Avaa kuva"
+          >
+            <img
+              src={obs.image_urls![0]}
+              alt={obs.name}
+              loading="lazy"
+              className="w-full max-h-[60vh] object-contain transition-transform duration-500 hover:scale-[1.01]"
+            />
           </button>
         ) : (
-          <div className="grid gap-3 mb-6 grid-cols-2 md:grid-cols-3">
-            {obs.image_urls.map((url, i) => (
-              <button key={i} onClick={() => setLightboxIdx(i)} className="group rounded-2xl overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary">
-                <div className="aspect-[4/3] bg-muted overflow-hidden">
-                  <img src={url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" loading="lazy" />
-                </div>
-              </button>
-            ))}
-          </div>
-        )
-      ) : (
-        <div className="mb-6 rounded-2xl overflow-hidden border border-dashed border-border">
-          <div className="aspect-[16/9] sm:aspect-[21/9] bg-muted/40 grid place-items-center text-muted-foreground text-sm">
-            🌿 Ei kuvia tähän havaintoon
+          <div className="aspect-[21/9] grid place-items-center text-5xl">🌿</div>
+        )}
+        <div className="p-5 sm:p-7 border-t border-border bg-card/80 backdrop-blur">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{obs.name}</h1>
+              {(obs.scientific_name || obs.species) && (
+                <p className="mt-1 italic text-muted-foreground">{obs.scientific_name || obs.species}</p>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+                <Calendar className="h-3.5 w-3.5" />
+                {format(new Date(obs.observed_at), "d.M.yyyy")}
+              </span>
+              {obs.location_name && (
+                <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+                  <MapPin className="h-3.5 w-3.5" />
+                  {obs.location_name}
+                </span>
+              )}
+              {obs.rarity && (
+                <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${rarityColor[obs.rarity] ?? "bg-muted text-muted-foreground"}`}>
+                  {obs.rarity}
+                </span>
+              )}
+            </div>
           </div>
         </div>
+      </section>
+
+      {/* Additional images */}
+      {hasImages && obs.image_urls!.length > 1 && (
+        <div className="grid gap-3 grid-cols-3 sm:grid-cols-4 md:grid-cols-6">
+          {obs.image_urls!.slice(1).map((url, i) => (
+            <button
+              key={i + 1}
+              onClick={() => setLightboxIdx(i + 1)}
+              className="group rounded-xl overflow-hidden border border-border bg-muted focus:outline-none focus:ring-2 focus:ring-primary aspect-square"
+            >
+              <img src={url} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="" loading="lazy" />
+            </button>
+          ))}
+        </div>
       )}
-
-
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <section className="rounded-2xl border border-border bg-card p-6">
-            <h3 className="font-semibold mb-4">Tiedot</h3>
-            <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+            <h3 className="font-semibold mb-4 text-lg">Tiedot</h3>
+            <dl className="grid sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
               <Item label="Päivä" value={format(new Date(obs.observed_at), "d.M.yyyy")} icon={Calendar} />
               <Item label="Laji" value={obs.species} />
               <Item label="Tieteellinen nimi" value={obs.scientific_name} italic />
@@ -120,21 +163,45 @@ function ObservationDetail() {
               <Item label="Harvinaisuus" value={obs.rarity} />
               <Item label="Paikka" value={obs.location_name} icon={MapPin} />
             </dl>
-            {obs.description && <div className="mt-4"><div className="text-xs text-muted-foreground mb-1">Kuvaus</div><p className="text-sm">{obs.description}</p></div>}
-            {obs.notes && <div className="mt-4"><div className="text-xs text-muted-foreground mb-1">Muistiinpanot</div><p className="text-sm whitespace-pre-wrap">{obs.notes}</p></div>}
+            {obs.description && (
+              <div className="mt-6 pt-5 border-t border-border">
+                <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">Kuvaus</div>
+                <p className="text-sm leading-relaxed">{obs.description}</p>
+              </div>
+            )}
+            {obs.notes && (
+              <div className="mt-5 pt-5 border-t border-border">
+                <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">Muistiinpanot</div>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{obs.notes}</p>
+              </div>
+            )}
             {obs.tags && obs.tags.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {obs.tags.map((t) => <span key={t} className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-accent text-accent-foreground"><Tag className="h-3 w-3" />{t}</span>)}
+              <div className="mt-5 pt-5 border-t border-border flex flex-wrap gap-2">
+                {obs.tags.map((t) => (
+                  <span key={t} className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-accent text-accent-foreground">
+                    <Tag className="h-3 w-3" />{t}
+                  </span>
+                ))}
               </div>
             )}
           </section>
         </div>
         <div className="space-y-6">
-          {obs.latitude && obs.longitude ? (
-            <MapView height="320px" points={[{ id: obs.id, lat: obs.latitude, lng: obs.longitude, title: obs.name, image: obs.image_urls?.[0] }]} />
-          ) : (
-            <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">Ei sijaintia</div>
-          )}
+          <section className="rounded-2xl border border-border bg-card overflow-hidden">
+            <div className="px-5 py-3 border-b border-border flex items-center gap-2 text-sm font-medium">
+              <MapPin className="h-4 w-4 text-primary" /> Sijainti
+            </div>
+            {obs.latitude && obs.longitude ? (
+              <MapView height="280px" points={[{ id: obs.id, lat: obs.latitude, lng: obs.longitude, title: obs.name, image: obs.image_urls?.[0] }]} />
+            ) : (
+              <div className="p-6 text-center text-sm text-muted-foreground">Ei sijaintia</div>
+            )}
+            {obs.latitude && obs.longitude && (
+              <div className="px-5 py-3 text-xs text-muted-foreground font-mono">
+                {obs.latitude.toFixed(5)}, {obs.longitude.toFixed(5)}
+              </div>
+            )}
+          </section>
         </div>
       </div>
 
