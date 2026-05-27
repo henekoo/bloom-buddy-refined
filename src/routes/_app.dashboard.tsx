@@ -18,20 +18,23 @@ function Dashboard() {
     queryKey: ["dashboard", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [obs, proj] = await Promise.all([
-        supabase.from("observations").select("*").order("created_at", { ascending: false }).limit(100),
+      const [recent, all, proj] = await Promise.all([
+        supabase.from("observations").select("*").order("created_at", { ascending: false }).limit(12),
+        supabase.from("observations").select("id, species, name, latitude, longitude"),
         supabase.from("projects").select("*").order("created_at", { ascending: false }),
       ]);
-      if (obs.error) throw obs.error;
+      if (recent.error) throw recent.error;
+      if (all.error) throw all.error;
       if (proj.error) throw proj.error;
-      return { observations: obs.data, projects: proj.data };
+      return { recent: recent.data, all: all.data, projects: proj.data };
     },
   });
 
-  const observations = data?.observations ?? [];
+  const observations = data?.recent ?? [];
+  const allObs = data?.all ?? [];
   const projects = data?.projects ?? [];
-  const speciesSet = new Set(observations.map((o) => o.species || o.name).filter(Boolean));
-  const withGps = observations.filter((o) => o.latitude && o.longitude);
+  const speciesSet = new Set(allObs.map((o) => o.species || o.name).filter(Boolean));
+  const withGps = allObs.filter((o) => o.latitude && o.longitude);
 
   return (
     <div className="space-y-8">
@@ -48,7 +51,7 @@ function Dashboard() {
       />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Havaintoja" value={isLoading ? "…" : observations.length} icon={Leaf} />
+        <StatCard label="Havaintoja" value={isLoading ? "…" : allObs.length} icon={Leaf} />
         <StatCard label="Eri lajeja" value={isLoading ? "…" : speciesSet.size} icon={Sprout} />
         <StatCard label="Projekteja" value={isLoading ? "…" : projects.length} icon={FolderTree} />
         <StatCard label="GPS-merkattuja" value={isLoading ? "…" : withGps.length} icon={MapPin} />

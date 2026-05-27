@@ -58,27 +58,34 @@ function EditProject() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) { toast.error("Kirjaudu sisään"); return; }
     if (!form.name.trim()) { toast.error("Anna projektille nimi"); return; }
     setSaving(true);
     try {
-      const { error } = await supabase.from("projects").update({
-        name: form.name,
+      const payload = {
+        name: form.name.trim(),
         description: form.description || null,
         project_type: form.project_type,
         location_name: form.location_name || null,
-        latitude: form.latitude, longitude: form.longitude,
+        latitude: form.latitude,
+        longitude: form.longitude,
         area_sqm: form.area_sqm ? Number(form.area_sqm) : null,
         notes: form.notes || null,
         cover_image_url: form.cover_image_url || null,
-      }).eq("id", id);
-      if (error) throw error;
+        updated_at: new Date().toISOString(),
+      };
+      const { error } = await supabase.from("projects").update(payload).eq("id", id).eq("user_id", user.id);
+      if (error) {
+        console.error("Project update error:", error);
+        throw new Error(error.message || error.details || "Tallennus epäonnistui");
+      }
       qc.invalidateQueries({ queryKey: ["project", id] });
       qc.invalidateQueries({ queryKey: ["projects"] });
       toast.success("Muutokset tallennettu");
       nav({ to: "/projects/$id", params: { id } });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Virhe");
+      console.error("Project save failed:", err);
+      toast.error(err instanceof Error ? err.message : "Tallennus epäonnistui");
     } finally { setSaving(false); }
   };
 
