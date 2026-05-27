@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { PageHeader } from "@/components/PageHeader";
+
 import { Button } from "@/components/ui/button";
 import { MapView } from "@/components/MapView";
 import { SpeciesInfoDialog } from "@/components/SpeciesInfoDialog";
