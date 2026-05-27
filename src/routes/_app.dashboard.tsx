@@ -51,7 +51,7 @@ function Dashboard() {
       />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Havaintoja" value={isLoading ? "…" : observations.length} icon={Leaf} />
+        <StatCard label="Havaintoja" value={isLoading ? "…" : allObs.length} icon={Leaf} />
         <StatCard label="Eri lajeja" value={isLoading ? "…" : speciesSet.size} icon={Sprout} />
         <StatCard label="Projekteja" value={isLoading ? "…" : projects.length} icon={FolderTree} />
         <StatCard label="GPS-merkattuja" value={isLoading ? "…" : withGps.length} icon={MapPin} />
