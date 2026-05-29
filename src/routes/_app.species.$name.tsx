@@ -23,10 +23,9 @@ function SpeciesDetail() {
       const { data, error } = await supabase
         .from("observations")
         .select("*")
-        .or(`species.eq.${name},scientific_name.eq.${name}`)
         .order("observed_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []).filter((o) => o.species === name || o.scientific_name === name);
     },
   });
 
