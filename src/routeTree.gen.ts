@@ -18,6 +18,7 @@ import { Route as AppExploreRouteImport } from './routes/_app.explore'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppProjectsIndexRouteImport } from './routes/_app.projects.index'
 import { Route as AppObservationsIndexRouteImport } from './routes/_app.observations.index'
+import { Route as AppSpeciesNameRouteImport } from './routes/_app.species.$name'
 import { Route as AppProjectsNewRouteImport } from './routes/_app.projects.new'
 import { Route as AppProjectsIdRouteImport } from './routes/_app.projects.$id'
 import { Route as AppObservationsNewRouteImport } from './routes/_app.observations.new'
@@ -69,6 +70,11 @@ const AppObservationsIndexRoute = AppObservationsIndexRouteImport.update({
   path: '/observations/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSpeciesNameRoute = AppSpeciesNameRouteImport.update({
+  id: '/$name',
+  path: '/$name',
+  getParentRoute: () => AppSpeciesRoute,
+} as any)
 const AppProjectsNewRoute = AppProjectsNewRouteImport.update({
   id: '/projects/new',
   path: '/projects/new',
@@ -106,11 +112,12 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/explore': typeof AppExploreRoute
   '/map': typeof AppMapRoute
-  '/species': typeof AppSpeciesRoute
+  '/species': typeof AppSpeciesRouteWithChildren
   '/observations/$id': typeof AppObservationsIdRouteWithChildren
   '/observations/new': typeof AppObservationsNewRoute
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
   '/projects/new': typeof AppProjectsNewRoute
+  '/species/$name': typeof AppSpeciesNameRoute
   '/observations/': typeof AppObservationsIndexRoute
   '/projects/': typeof AppProjectsIndexRoute
   '/observations/$id/edit': typeof AppObservationsIdEditRoute
@@ -122,11 +129,12 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/explore': typeof AppExploreRoute
   '/map': typeof AppMapRoute
-  '/species': typeof AppSpeciesRoute
+  '/species': typeof AppSpeciesRouteWithChildren
   '/observations/$id': typeof AppObservationsIdRouteWithChildren
   '/observations/new': typeof AppObservationsNewRoute
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
   '/projects/new': typeof AppProjectsNewRoute
+  '/species/$name': typeof AppSpeciesNameRoute
   '/observations': typeof AppObservationsIndexRoute
   '/projects': typeof AppProjectsIndexRoute
   '/observations/$id/edit': typeof AppObservationsIdEditRoute
@@ -140,11 +148,12 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/explore': typeof AppExploreRoute
   '/_app/map': typeof AppMapRoute
-  '/_app/species': typeof AppSpeciesRoute
+  '/_app/species': typeof AppSpeciesRouteWithChildren
   '/_app/observations/$id': typeof AppObservationsIdRouteWithChildren
   '/_app/observations/new': typeof AppObservationsNewRoute
   '/_app/projects/$id': typeof AppProjectsIdRouteWithChildren
   '/_app/projects/new': typeof AppProjectsNewRoute
+  '/_app/species/$name': typeof AppSpeciesNameRoute
   '/_app/observations/': typeof AppObservationsIndexRoute
   '/_app/projects/': typeof AppProjectsIndexRoute
   '/_app/observations/$id/edit': typeof AppObservationsIdEditRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/observations/new'
     | '/projects/$id'
     | '/projects/new'
+    | '/species/$name'
     | '/observations/'
     | '/projects/'
     | '/observations/$id/edit'
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/observations/new'
     | '/projects/$id'
     | '/projects/new'
+    | '/species/$name'
     | '/observations'
     | '/projects'
     | '/observations/$id/edit'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/_app/observations/new'
     | '/_app/projects/$id'
     | '/_app/projects/new'
+    | '/_app/species/$name'
     | '/_app/observations/'
     | '/_app/projects/'
     | '/_app/observations/$id/edit'
@@ -273,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppObservationsIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/species/$name': {
+      id: '/_app/species/$name'
+      path: '/$name'
+      fullPath: '/species/$name'
+      preLoaderRoute: typeof AppSpeciesNameRouteImport
+      parentRoute: typeof AppSpeciesRoute
+    }
     '/_app/projects/new': {
       id: '/_app/projects/new'
       path: '/projects/new'
@@ -318,6 +337,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppSpeciesRouteChildren {
+  AppSpeciesNameRoute: typeof AppSpeciesNameRoute
+}
+
+const AppSpeciesRouteChildren: AppSpeciesRouteChildren = {
+  AppSpeciesNameRoute: AppSpeciesNameRoute,
+}
+
+const AppSpeciesRouteWithChildren = AppSpeciesRoute._addFileChildren(
+  AppSpeciesRouteChildren,
+)
+
 interface AppObservationsIdRouteChildren {
   AppObservationsIdEditRoute: typeof AppObservationsIdEditRoute
 }
@@ -345,7 +376,7 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppExploreRoute: typeof AppExploreRoute
   AppMapRoute: typeof AppMapRoute
-  AppSpeciesRoute: typeof AppSpeciesRoute
+  AppSpeciesRoute: typeof AppSpeciesRouteWithChildren
   AppObservationsIdRoute: typeof AppObservationsIdRouteWithChildren
   AppObservationsNewRoute: typeof AppObservationsNewRoute
   AppProjectsIdRoute: typeof AppProjectsIdRouteWithChildren
@@ -358,7 +389,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppExploreRoute: AppExploreRoute,
   AppMapRoute: AppMapRoute,
-  AppSpeciesRoute: AppSpeciesRoute,
+  AppSpeciesRoute: AppSpeciesRouteWithChildren,
   AppObservationsIdRoute: AppObservationsIdRouteWithChildren,
   AppObservationsNewRoute: AppObservationsNewRoute,
   AppProjectsIdRoute: AppProjectsIdRouteWithChildren,

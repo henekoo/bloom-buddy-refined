@@ -62,21 +62,25 @@ function EditProject() {
     if (!form.name.trim()) { toast.error("Anna projektille nimi"); return; }
     setSaving(true);
     try {
+      const validTypes = PROJECT_TYPES.map((t) => t.value) as string[];
+      const safeType = (validTypes.includes(form.project_type as string)
+        ? form.project_type
+        : "other") as ProjectTypeValue;
       const payload = {
         name: form.name.trim(),
         description: form.description || null,
-        project_type: form.project_type,
+        project_type: safeType,
         location_name: form.location_name || null,
         latitude: form.latitude,
         longitude: form.longitude,
         area_sqm: form.area_sqm ? Number(form.area_sqm) : null,
         notes: form.notes || null,
-        cover_image_url: form.cover_image_url || null,
+        cover_image_url: form.cover_image_url?.trim() ? form.cover_image_url.trim() : null,
         updated_at: new Date().toISOString(),
       };
       const { error } = await supabase.from("projects").update(payload).eq("id", id).eq("user_id", user.id);
       if (error) {
-        console.error("Project update error:", error);
+        console.error("Project update error:", error, "payload:", payload);
         throw new Error(error.message || error.details || "Tallennus epäonnistui");
       }
       qc.invalidateQueries({ queryKey: ["project", id] });
@@ -105,7 +109,7 @@ function EditProject() {
               <div className="sm:col-span-2"><Label>Nimi *</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
               <div>
                 <Label>Tyyppi</Label>
-                <Select value={form.project_type} onValueChange={(v) => setForm({ ...form, project_type: v as ProjectTypeValue })}>
+                <Select value={form.project_type} onValueChange={(v) => { if (v) setForm({ ...form, project_type: v as ProjectTypeValue }); }}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {PROJECT_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.emoji} {t.label}</SelectItem>)}
