@@ -109,7 +109,7 @@ function EditProject() {
               <div className="sm:col-span-2"><Label>Nimi *</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
               <div>
                 <Label>Tyyppi</Label>
-                <Select value={form.project_type} onValueChange={(v) => setForm({ ...form, project_type: v as ProjectTypeValue })}>
+                <Select value={form.project_type} onValueChange={(v) => { if (v) setForm({ ...form, project_type: v as ProjectTypeValue }); }}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {PROJECT_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.emoji} {t.label}</SelectItem>)}
