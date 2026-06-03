@@ -66,7 +66,7 @@ export function CoverImagePicker({
         >
           {uploading ? <Loader2 className="h-7 w-7 text-primary animate-spin" /> : <Upload className="h-7 w-7 text-primary" />}
           <div className="text-sm font-medium">{uploading ? "Ladataan…" : "Lataa kansikuva laitteelta"}</div>
-          <div className="text-xs text-muted-foreground">JPG, PNG, WebP · max 10 MB</div>
+          <div className="text-xs text-muted-foreground">JPG, PNG, WebP · max 20 MB</div>
         </button>
       )}
       <input
