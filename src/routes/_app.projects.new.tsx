@@ -44,7 +44,7 @@ function NewProject() {
         latitude: form.latitude, longitude: form.longitude,
         area_sqm: form.area_sqm ? Number(form.area_sqm) : null,
         notes: form.notes || null,
-        cover_image_url: form.cover_image_url || null,
+        cover_image_url: form.cover_image_url?.trim() ? form.cover_image_url.trim() : null,
       }).select().single();
       if (error) throw error;
       toast.success("Projekti luotu!");
