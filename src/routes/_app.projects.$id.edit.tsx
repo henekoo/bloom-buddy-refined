@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PROJECT_TYPES, type ProjectTypeValue } from "@/lib/project-types";
+import { PROJECT_TYPES, normalizeProjectType, type ProjectTypeValue } from "@/lib/project-types";
 import { MapView } from "@/components/MapView";
 import { CoverImagePicker } from "@/components/CoverImagePicker";
 import { toast } from "sonner";
@@ -46,7 +46,7 @@ function EditProject() {
     setForm({
       name: project.name ?? "",
       description: project.description ?? "",
-      project_type: (project.project_type ?? "house_yard") as ProjectTypeValue,
+      project_type: normalizeProjectType(project.project_type, "house_yard"),
       location_name: project.location_name ?? "",
       area_sqm: project.area_sqm != null ? String(project.area_sqm) : "",
       latitude: project.latitude,
@@ -62,10 +62,7 @@ function EditProject() {
     if (!form.name.trim()) { toast.error("Anna projektille nimi"); return; }
     setSaving(true);
     try {
-      const validTypes = PROJECT_TYPES.map((t) => t.value) as string[];
-      const safeType = (validTypes.includes(form.project_type as string)
-        ? form.project_type
-        : "other") as ProjectTypeValue;
+      const safeType = normalizeProjectType(form.project_type);
       const payload = {
         name: form.name.trim(),
         description: form.description || null,
@@ -109,7 +106,7 @@ function EditProject() {
               <div className="sm:col-span-2"><Label>Nimi *</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
               <div>
                 <Label>Tyyppi</Label>
-                <Select value={form.project_type} onValueChange={(v) => { if (v) setForm({ ...form, project_type: v as ProjectTypeValue }); }}>
+                <Select value={normalizeProjectType(form.project_type, "house_yard")} onValueChange={(v) => setForm({ ...form, project_type: normalizeProjectType(v, "house_yard") })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {PROJECT_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.emoji} {t.label}</SelectItem>)}
@@ -119,7 +116,7 @@ function EditProject() {
               <div><Label>Pinta-ala (m²)</Label><Input type="number" value={form.area_sqm} onChange={(e) => setForm({ ...form, area_sqm: e.target.value })} /></div>
               <div className="sm:col-span-2"><Label>Paikan nimi</Label><Input value={form.location_name} onChange={(e) => setForm({ ...form, location_name: e.target.value })} /></div>
               <div className="sm:col-span-2">
-                <CoverImagePicker value={form.cover_image_url} onChange={(v) => setForm({ ...form, cover_image_url: v })} />
+                <CoverImagePicker value={form.cover_image_url} onChange={(v) => setForm((current) => ({ ...current, cover_image_url: v }))} />
               </div>
               <div className="sm:col-span-2"><Label>Kuvaus</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} /></div>
               <div className="sm:col-span-2"><Label>Muistiinpanot</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3} /></div>

@@ -3,7 +3,7 @@ import { Upload, X, ImageIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+const MAX_SIZE = 20 * 1024 * 1024; // 20 MB
 const ACCEPTED = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif", "image/gif"];
 
 type Preview = { file: File; url: string };
@@ -56,7 +56,7 @@ export function ImageUpload({
     for (const f of incoming) {
       const okType = f.type ? ACCEPTED.includes(f.type) || f.type.startsWith("image/") : /\.(jpe?g|png|webp|heic|heif|gif)$/i.test(f.name);
       if (!okType) { rejected.push(`${f.name}: ei tuettu tiedostotyyppi`); continue; }
-      if (f.size > MAX_SIZE) { rejected.push(`${f.name}: liian iso (max 10 MB)`); continue; }
+      if (f.size > MAX_SIZE) { rejected.push(`${f.name}: liian iso (max 20 MB)`); continue; }
       accepted.push(f);
     }
     if (rejected.length) toast.error(rejected.join("\n"));
@@ -94,7 +94,7 @@ export function ImageUpload({
           {uploading ? "Ladataan kuvia…" : "Raahaa kuvat tai klikkaa valitaksesi"}
         </div>
         <div className="text-xs text-muted-foreground mt-1">
-          JPG, PNG, WebP, HEIC · max 10 MB · enintään {max} kuvaa
+          JPG, PNG, WebP, HEIC · max 20 MB · enintään {max} kuvaa
         </div>
         <input
           ref={inputRef}

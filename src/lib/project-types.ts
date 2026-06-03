@@ -12,6 +12,13 @@ export const PROJECT_TYPES = [
 
 export type ProjectTypeValue = (typeof PROJECT_TYPES)[number]["value"];
 
+export function normalizeProjectType(
+  value: string | null | undefined,
+  fallback: ProjectTypeValue = "other",
+): ProjectTypeValue {
+  return PROJECT_TYPES.some((type) => type.value === value) ? (value as ProjectTypeValue) : fallback;
+}
+
 export function projectTypeMeta(value: string | null | undefined) {
   return PROJECT_TYPES.find((t) => t.value === value) ?? PROJECT_TYPES[PROJECT_TYPES.length - 1];
 }

@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Upload, X, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { uploadProjectCover } from "@/lib/storage";
 import { toast } from "sonner";
@@ -66,7 +67,7 @@ export function CoverImagePicker({
         >
           {uploading ? <Loader2 className="h-7 w-7 text-primary animate-spin" /> : <Upload className="h-7 w-7 text-primary" />}
           <div className="text-sm font-medium">{uploading ? "Ladataan…" : "Lataa kansikuva laitteelta"}</div>
-          <div className="text-xs text-muted-foreground">JPG, PNG, WebP · max 10 MB</div>
+          <div className="text-xs text-muted-foreground">JPG, PNG, WebP · max 20 MB</div>
         </button>
       )}
       <input
@@ -79,6 +80,17 @@ export function CoverImagePicker({
           if (f) handleFile(f);
         }}
       />
+      <div className="space-y-1.5">
+        <Label htmlFor="cover-image-url" className="text-xs text-muted-foreground">Tai liitä kuvan URL</Label>
+        <Input
+          id="cover-image-url"
+          type="url"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="https://example.com/kansikuva.jpg"
+          autoComplete="off"
+        />
+      </div>
     </div>
   );
 }

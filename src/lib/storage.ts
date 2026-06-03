@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-const MAX_SIZE = 10 * 1024 * 1024;
+const MAX_SIZE = 20 * 1024 * 1024;
 
 export type UploadProgress = (done: number, total: number) => void;
 
@@ -14,7 +14,7 @@ export async function uploadObservationImages(
   onProgress?.(0, files.length);
   for (const file of files) {
     if (file.size > MAX_SIZE) {
-      throw new Error(`${file.name} on liian iso (max 10 MB)`);
+      throw new Error(`${file.name} on liian iso (max 20 MB)`);
     }
     if (file.type && !file.type.startsWith("image/")) {
       throw new Error(`${file.name}: ei tuettu tiedostotyyppi`);
@@ -38,7 +38,7 @@ export async function uploadObservationImages(
 }
 
 export async function uploadProjectCover(userId: string, file: File): Promise<string> {
-  if (file.size > MAX_SIZE) throw new Error(`${file.name} on liian iso (max 10 MB)`);
+  if (file.size > MAX_SIZE) throw new Error(`${file.name} on liian iso (max 20 MB)`);
   if (file.type && !file.type.startsWith("image/")) throw new Error("Ei tuettu tiedostotyyppi");
   const extFromName = file.name.split(".").pop()?.toLowerCase();
   const extFromType = file.type?.split("/").pop()?.toLowerCase();
