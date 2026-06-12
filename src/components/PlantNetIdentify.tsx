@@ -67,6 +67,7 @@ export function PlantNetIdentify({
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Suggestion[] | null>(null);
   const [failed, setFailed] = useState(false);
+  const [errorText, setErrorText] = useState<string | null>(null);
 
   const identify = async () => {
     if (!file) {
@@ -76,6 +77,7 @@ export function PlantNetIdentify({
     setLoading(true);
     setFailed(false);
     setResults(null);
+    setErrorText(null);
     try {
       const jpeg = await toPlantNetImage(file).catch((error) => {
         console.error("PlantNet image conversion failed", error);
@@ -83,6 +85,7 @@ export function PlantNetIdentify({
       });
       if (!jpeg) {
         toast.error("Kuvaa ei voitu lukea — kokeile JPG- tai PNG-kuvaa.");
+        setErrorText("Kuvaa ei voitu lukea — kokeile JPG- tai PNG-kuvaa.");
         return;
       }
       const fd = new FormData();
@@ -95,7 +98,9 @@ export function PlantNetIdentify({
       const data = await res.json().catch(() => null);
       if (!res.ok || !data) {
         console.error("PlantNet error", res.status, data);
-        toast.error(data?.message ? `PlantNet: ${data.message}` : `PlantNet virhe (${res.status})`);
+        const message = data?.message ? `PlantNet: ${data.message}` : `PlantNet virhe (${res.status})`;
+        toast.error(message);
+        setErrorText(message);
         return;
       }
       const top: Suggestion[] = (data.results ?? [])
@@ -114,7 +119,7 @@ export function PlantNetIdentify({
       }
     } catch (e) {
       console.error("PlantNet failed", e);
-      setFailed(true);
+      setErrorText("Tunnistuspalveluun ei saatu yhteyttä — yritä hetken päästä uudelleen.");
     } finally {
       setLoading(false);
     }
@@ -157,6 +162,7 @@ export function PlantNetIdentify({
       {failed && (
         <p className="text-xs text-muted-foreground">Lajia ei tunnistettu — voit lisätä lajin itse.</p>
       )}
+      {errorText && <p className="text-xs text-destructive">{errorText}</p>}
     </div>
   );
 }
