@@ -22,7 +22,7 @@ async function convertHeic(file: File): Promise<Blob> {
 }
 
 async function drawAsJpeg(blob: Blob): Promise<Blob> {
-  const url = URL.createObjectURL(file);
+  const url = URL.createObjectURL(blob);
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const i = new Image();

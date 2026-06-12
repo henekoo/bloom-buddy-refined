@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPlantnetIdentifyRouteImport } from './routes/api.plantnet-identify'
 import { Route as AppSpeciesRouteImport } from './routes/_app.species'
 import { Route as AppMapRouteImport } from './routes/_app.map'
 import { Route as AppExploreRouteImport } from './routes/_app.explore'
@@ -38,6 +39,11 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPlantnetIdentifyRoute = ApiPlantnetIdentifyRouteImport.update({
+  id: '/api/plantnet-identify',
+  path: '/api/plantnet-identify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppSpeciesRoute = AppSpeciesRouteImport.update({
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/explore': typeof AppExploreRoute
   '/map': typeof AppMapRoute
   '/species': typeof AppSpeciesRouteWithChildren
+  '/api/plantnet-identify': typeof ApiPlantnetIdentifyRoute
   '/observations/$id': typeof AppObservationsIdRouteWithChildren
   '/observations/new': typeof AppObservationsNewRoute
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/explore': typeof AppExploreRoute
   '/map': typeof AppMapRoute
   '/species': typeof AppSpeciesRouteWithChildren
+  '/api/plantnet-identify': typeof ApiPlantnetIdentifyRoute
   '/observations/$id': typeof AppObservationsIdRouteWithChildren
   '/observations/new': typeof AppObservationsNewRoute
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/_app/explore': typeof AppExploreRoute
   '/_app/map': typeof AppMapRoute
   '/_app/species': typeof AppSpeciesRouteWithChildren
+  '/api/plantnet-identify': typeof ApiPlantnetIdentifyRoute
   '/_app/observations/$id': typeof AppObservationsIdRouteWithChildren
   '/_app/observations/new': typeof AppObservationsNewRoute
   '/_app/projects/$id': typeof AppProjectsIdRouteWithChildren
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/map'
     | '/species'
+    | '/api/plantnet-identify'
     | '/observations/$id'
     | '/observations/new'
     | '/projects/$id'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/map'
     | '/species'
+    | '/api/plantnet-identify'
     | '/observations/$id'
     | '/observations/new'
     | '/projects/$id'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/_app/explore'
     | '/_app/map'
     | '/_app/species'
+    | '/api/plantnet-identify'
     | '/_app/observations/$id'
     | '/_app/observations/new'
     | '/_app/projects/$id'
@@ -218,6 +230,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPlantnetIdentifyRoute: typeof ApiPlantnetIdentifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -241,6 +254,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/plantnet-identify': {
+      id: '/api/plantnet-identify'
+      path: '/api/plantnet-identify'
+      fullPath: '/api/plantnet-identify'
+      preLoaderRoute: typeof ApiPlantnetIdentifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/species': {
@@ -404,17 +424,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPlantnetIdentifyRoute: ApiPlantnetIdentifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
