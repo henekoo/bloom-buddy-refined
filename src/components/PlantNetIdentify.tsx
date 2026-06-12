@@ -9,11 +9,19 @@ type Suggestion = {
   score: number;
 };
 
-const PLANTNET_ACCEPTED = ["image/jpeg", "image/jpg", "image/png"];
+const MAX_IDENTIFY_EDGE = 1920;
 
-// Convert any browser-decodable image (HEIC on Safari, webp, gif…) to JPEG via canvas.
-async function toJpegBlob(file: File): Promise<Blob> {
-  if (PLANTNET_ACCEPTED.includes(file.type)) return file;
+function isHeic(file: File) {
+  return /image\/(heic|heif)/i.test(file.type) || /\.(heic|heif)$/i.test(file.name);
+}
+
+async function convertHeic(file: File): Promise<Blob> {
+  const { default: heic2any } = await import("heic2any");
+  const converted = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
+  return Array.isArray(converted) ? converted[0] : converted;
+}
+
+async function drawAsJpeg(blob: Blob): Promise<Blob> {
   const url = URL.createObjectURL(file);
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -22,8 +30,7 @@ async function toJpegBlob(file: File): Promise<Blob> {
       i.onerror = () => reject(new Error("decode_failed"));
       i.src = url;
     });
-    const max = 1600;
-    const scale = Math.min(1, max / Math.max(img.width, img.height));
+    const scale = Math.min(1, MAX_IDENTIFY_EDGE / Math.max(img.width, img.height));
     const w = Math.round(img.width * scale);
     const h = Math.round(img.height * scale);
     const canvas = document.createElement("canvas");
@@ -31,14 +38,23 @@ async function toJpegBlob(file: File): Promise<Blob> {
     canvas.height = h;
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("canvas_unavailable");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, w, h);
     ctx.drawImage(img, 0, 0, w, h);
     const blob: Blob = await new Promise((resolve, reject) =>
-      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("encode_failed"))), "image/jpeg", 0.9),
+      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("encode_failed"))), "image/jpeg", 0.88),
     );
     return blob;
   } finally {
     URL.revokeObjectURL(url);
   }
+}
+
+async function toPlantNetImage(file: File): Promise<File> {
+  const source = isHeic(file) ? await convertHeic(file) : file;
+  const jpeg = await drawAsJpeg(source);
+  const safeName = file.name.replace(/\.[^.]+$/, "") || "plantnet-image";
+  return new File([jpeg], `${safeName}.jpg`, { type: "image/jpeg" });
 }
 
 export function PlantNetIdentify({
@@ -61,25 +77,22 @@ export function PlantNetIdentify({
     setFailed(false);
     setResults(null);
     try {
-      const jpeg = await toJpegBlob(file).catch(() => null);
+      const jpeg = await toPlantNetImage(file).catch((error) => {
+        console.error("PlantNet image conversion failed", error);
+        return null;
+      });
       if (!jpeg) {
         toast.error("Kuvaa ei voitu lukea — kokeile JPG- tai PNG-kuvaa.");
-        setFailed(true);
         return;
       }
       const fd = new FormData();
-      fd.append("images", jpeg, "image.jpg");
-      // organs is optional; "auto" lets PlantNet detect the organ
+      fd.append("images", jpeg, jpeg.name);
       fd.append("organs", "auto");
-      const res = await fetch(
-        "https://my-api.plantnet.org/v2/identify/all?api-key=2b10zkMSHaTsFO4U2DeBcETOe&lang=fi&nb-results=5",
-        { method: "POST", body: fd },
-      );
+      const res = await fetch("/api/plantnet-identify", { method: "POST", body: fd });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data) {
         console.error("PlantNet error", res.status, data);
         toast.error(data?.message ? `PlantNet: ${data.message}` : `PlantNet virhe (${res.status})`);
-        setFailed(true);
         return;
       }
       const top: Suggestion[] = (data.results ?? [])
