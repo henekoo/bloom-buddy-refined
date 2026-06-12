@@ -9,6 +9,38 @@ type Suggestion = {
   score: number;
 };
 
+const PLANTNET_ACCEPTED = ["image/jpeg", "image/jpg", "image/png"];
+
+// Convert any browser-decodable image (HEIC on Safari, webp, gif…) to JPEG via canvas.
+async function toJpegBlob(file: File): Promise<Blob> {
+  if (PLANTNET_ACCEPTED.includes(file.type)) return file;
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error("decode_failed"));
+      i.src = url;
+    });
+    const max = 1600;
+    const scale = Math.min(1, max / Math.max(img.width, img.height));
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("canvas_unavailable");
+    ctx.drawImage(img, 0, 0, w, h);
+    const blob: Blob = await new Promise((resolve, reject) =>
+      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("encode_failed"))), "image/jpeg", 0.9),
+    );
+    return blob;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 export function PlantNetIdentify({
   file,
   onPick,
@@ -29,31 +61,43 @@ export function PlantNetIdentify({
     setFailed(false);
     setResults(null);
     try {
+      const jpeg = await toJpegBlob(file).catch(() => null);
+      if (!jpeg) {
+        toast.error("Kuvaa ei voitu lukea — kokeile JPG- tai PNG-kuvaa.");
+        setFailed(true);
+        return;
+      }
       const fd = new FormData();
-      fd.append("images", file);
-      fd.append("organs", "leaf");
+      fd.append("images", jpeg, "image.jpg");
+      // organs is optional; "auto" lets PlantNet detect the organ
+      fd.append("organs", "auto");
       const res = await fetch(
-        "https://my-api.plantnet.org/v2/identify/all?api-key=2b10zkMSHaTsFO4U2DeBcETOe&lang=fi",
+        "https://my-api.plantnet.org/v2/identify/all?api-key=2b10zkMSHaTsFO4U2DeBcETOe&lang=fi&nb-results=5",
         { method: "POST", body: fd },
       );
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const top: Suggestion[] = (data.results ?? []).slice(0, 3).map((r: any) => {
-        const fiName =
-          (r.species?.commonNames ?? []).find((n: string) => /[äöå]/i.test(n)) ??
-          r.species?.commonNames?.[0];
-        return {
-          scientificName: r.species?.scientificNameWithoutAuthor ?? r.species?.scientificName ?? "",
-          commonName: fiName,
-          score: r.score ?? 0,
-        };
-      }).filter((s: Suggestion) => s.scientificName);
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data) {
+        console.error("PlantNet error", res.status, data);
+        toast.error(data?.message ? `PlantNet: ${data.message}` : `PlantNet virhe (${res.status})`);
+        setFailed(true);
+        return;
+      }
+      const top: Suggestion[] = (data.results ?? [])
+        .slice(0, 3)
+        .map((r: any) => ({
+          scientificName:
+            r.species?.scientificNameWithoutAuthor ?? r.species?.scientificName ?? "",
+          commonName: r.species?.commonNames?.[0],
+          score: typeof r.score === "number" ? r.score : 0,
+        }))
+        .filter((s: Suggestion) => s.scientificName);
       if (!top.length) {
         setFailed(true);
       } else {
         setResults(top);
       }
-    } catch {
+    } catch (e) {
+      console.error("PlantNet failed", e);
       setFailed(true);
     } finally {
       setLoading(false);
