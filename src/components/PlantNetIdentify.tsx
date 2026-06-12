@@ -88,7 +88,10 @@ export function PlantNetIdentify({
       const fd = new FormData();
       fd.append("images", jpeg, jpeg.name);
       fd.append("organs", "auto");
-      const res = await fetch("/api/plantnet-identify", { method: "POST", body: fd });
+      const res = await fetch(
+        "https://my-api.plantnet.org/v2/identify/all?api-key=2b10zkMSHaTsFO4U2DeBcETOe&lang=fi&nb-results=5&no-reject=true",
+        { method: "POST", body: fd },
+      );
       const data = await res.json().catch(() => null);
       if (!res.ok || !data) {
         console.error("PlantNet error", res.status, data);
