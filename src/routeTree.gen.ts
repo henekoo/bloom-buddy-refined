@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiPlantnetIdentifyRouteImport } from './routes/api.plantnet-identify'
+import { Route as ApiPlantnetIdentifyRouteImport } from './routes/api/plantnet-identify'
 import { Route as AppSpeciesRouteImport } from './routes/_app.species'
 import { Route as AppMapRouteImport } from './routes/_app.map'
 import { Route as AppExploreRouteImport } from './routes/_app.explore'
@@ -429,3 +429,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
