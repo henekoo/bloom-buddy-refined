@@ -163,6 +163,10 @@ function NewObservation() {
               )}
             </div>
             <ImageUpload files={files} onChange={setFiles} uploading={uploading} disabled={saving && !uploading} />
+            <PlantNetIdentify
+              file={files[0] ?? null}
+              onPick={(v) => setForm((f) => ({ ...f, species: v.species, scientific_name: v.scientific_name, name: f.name || v.species }))}
+            />
           </section>
 
         </div>
