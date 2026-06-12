@@ -20,11 +20,23 @@ export function TaxonSearch({
   label?: string;
   required?: boolean;
 }) {
-  const [q, setQ] = useState(species || scientificName || "");
+  const [q, setQ] = useState(species ? `${species}${scientificName ? ` (${scientificName})` : ""}` : (scientificName || ""));
   const [debounced, setDebounced] = useState("");
   const [open, setOpen] = useState(false);
   const [picked, setPicked] = useState<boolean>(!!(species || scientificName));
   const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Sync when species/scientificName are set externally (e.g. PlantNet pick)
+  useEffect(() => {
+    if (species || scientificName) {
+      const label = species
+        ? `${species}${scientificName ? ` (${scientificName})` : ""}`
+        : scientificName;
+      setQ(label);
+      setPicked(true);
+      setOpen(false);
+    }
+  }, [species, scientificName]);
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(q.trim()), 220);
