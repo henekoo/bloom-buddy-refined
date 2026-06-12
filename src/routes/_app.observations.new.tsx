@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ImageUpload } from "@/components/ImageUpload";
 import { MapView } from "@/components/MapView";
 import { TaxonSearch } from "@/components/TaxonSearch";
+import { PlantNetIdentify } from "@/components/PlantNetIdentify";
 import { uploadObservationImages } from "@/lib/storage";
 import { toast } from "sonner";
 import { MapPin, Loader2 } from "lucide-react";
